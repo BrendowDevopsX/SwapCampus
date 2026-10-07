@@ -38,16 +38,7 @@ class EditListingViewModel(
                 return@launch
             }
 
-            val annonce = listingRepository.allListings()
-                .let { flow ->
-                    var found: Annonce? = null
-                    flow.collect { list ->
-                        found = list.firstOrNull { it.id == listingId }
-                        return@collect
-                    }
-                    found
-                }
-
+            val annonce = listingRepository.getListingById(listingId)
             if (annonce == null) {
                 _uiState.value = EditUiState.Error("Listing not found")
                 return@launch

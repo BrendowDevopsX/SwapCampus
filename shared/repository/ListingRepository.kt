@@ -12,6 +12,8 @@ interface ListingRepository {
 
     fun searchListings(motCle: String?, categorie: Categorie?): Flow<List<Annonce>>
 
+    suspend fun getListingById(id: Int): Annonce?
+
     suspend fun postListing(
         titre: String,
         description: String,
@@ -30,7 +32,7 @@ interface ListingRepository {
         photoUrl: String? = null
     ): Result<Annonce?>
 
-    suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce?
+    suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Result<Annonce>
 
     suspend fun removeListing(id: Int): Boolean
 }

@@ -4,7 +4,10 @@ import com.isep.shared.domain.CatalogueAnnonces
 import com.isep.shared.domain.entities.Annonce
 import com.isep.shared.domain.entities.Categorie
 import com.isep.shared.domain.entities.CompteUtilisateur
+import com.isep.shared.domain.entities.Disponible
 import com.isep.shared.domain.entities.EtatAnnonce
+import com.isep.shared.domain.entities.Reservee
+import com.isep.shared.domain.entities.Vendue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -27,6 +30,9 @@ class ListingRepositoryImpl(
                 matchesKeyword && matchesCategory
             }
         }
+
+    override suspend fun getListingById(id: Int): Annonce? =
+        state.value.firstOrNull { it.id == id }
 
     override suspend fun postListing(
         titre: String,
@@ -69,10 +75,21 @@ class ListingRepositoryImpl(
         return Result.success(updated)
     }
 
-    override suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce? {
+    override suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Result<Annonce> {
+        val current = state.value.firstOrNull { it.id == id }
+            ?: return Result.failure(NoSuchElementException("Listing not found: id=$id"))
+
+        if (!isValidTransition(current.etat, nouvelEtat)) {
+            return Result.failure(
+                IllegalStateException("Invalid transition: ${current.etat} -> $nouvelEtat")
+            )
+        }
+
         val updated = catalogue.changerEtat(id, nouvelEtat)
+            ?: return Result.failure(NoSuchElementException("Listing not found: id=$id"))
+
         syncState()
-        return updated
+        return Result.success(updated)
     }
 
     override suspend fun removeListing(id: Int): Boolean {
@@ -89,5 +106,11 @@ class ListingRepositoryImpl(
         if (titre != null && titre.isBlank()) return "Title must not be empty"
         if (prix != null && prix <= 0.0) return "Price must be greater than 0"
         return null
+    }
+
+    private fun isValidTransition(from: EtatAnnonce, to: EtatAnnonce): Boolean = when (from) {
+        is Disponible -> to is Reservee
+        is Reservee   -> to is Vendue || to is Disponible
+        is Vendue     -> to is Disponible
     }
 }
