@@ -4,14 +4,15 @@ import com.isep.shared.domain.entities.Annonce
 import com.isep.shared.domain.entities.Categorie
 import com.isep.shared.domain.entities.CompteUtilisateur
 import com.isep.shared.domain.entities.EtatAnnonce
+import kotlinx.coroutines.flow.Flow
 
 interface ListingRepository {
 
-    fun allListings(): List<Annonce>
+    fun allListings(): Flow<List<Annonce>>
 
-    fun searchListings(motCle: String?, categorie: Categorie?): List<Annonce>
+    fun searchListings(motCle: String?, categorie: Categorie?): Flow<List<Annonce>>
 
-    fun postListing(
+    suspend fun postListing(
         titre: String,
         description: String,
         prix: Double,
@@ -20,7 +21,7 @@ interface ListingRepository {
         photoUrl: String? = null
     ): Annonce
 
-    fun updateListing(
+    suspend fun updateListing(
         id: Int,
         titre: String? = null,
         description: String? = null,
@@ -29,7 +30,7 @@ interface ListingRepository {
         photoUrl: String? = null
     ): Annonce?
 
-    fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce?
+    suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce?
 
-    fun removeListing(id: Int): Boolean
+    suspend fun removeListing(id: Int): Boolean
 }

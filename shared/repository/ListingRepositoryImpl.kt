@@ -5,40 +5,72 @@ import com.isep.shared.domain.entities.Annonce
 import com.isep.shared.domain.entities.Categorie
 import com.isep.shared.domain.entities.CompteUtilisateur
 import com.isep.shared.domain.entities.EtatAnnonce
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 class ListingRepositoryImpl(
     private val catalogue: CatalogueAnnonces = CatalogueAnnonces()
 ) : ListingRepository {
 
-    override fun allListings(): List<Annonce> =
-        catalogue.toutesLesAnnonces()
+    private val state = MutableStateFlow(catalogue.toutesLesAnnonces().toList())
 
-    override fun searchListings(motCle: String?, categorie: Categorie?): List<Annonce> =
-        catalogue.rechercherAnnonces(motCle, categorie)
+    override fun allListings(): Flow<List<Annonce>> = state
 
-    override fun postListing(
+    override fun searchListings(motCle: String?, categorie: Categorie?): Flow<List<Annonce>> =
+        state.map { list ->
+            list.filter { annonce ->
+                val matchesKeyword = motCle.isNullOrBlank() ||
+                    annonce.titre.contains(motCle, ignoreCase = true) ||
+                    annonce.description.contains(motCle, ignoreCase = true)
+                val matchesCategory = categorie == null || annonce.categorie == categorie
+                matchesKeyword && matchesCategory
+            }
+        }
+
+    override suspend fun postListing(
         titre: String,
         description: String,
         prix: Double,
         categorie: Categorie,
         auteur: CompteUtilisateur,
         photoUrl: String?
-    ): Annonce =
-        catalogue.publierAnnonce(titre, description, prix, categorie, auteur, photoUrl)
+    ): Annonce {
+        val created = catalogue.publierAnnonce(
+            titre, description, prix, categorie, auteur, photoUrl
+        )
+        syncState()
+        return created
+    }
 
-    override fun updateListing(
+    override suspend fun updateListing(
         id: Int,
         titre: String?,
         description: String?,
         prix: Double?,
         categorie: Categorie?,
         photoUrl: String?
-    ): Annonce? =
-        catalogue.modifierAnnonce(id, titre, description, prix, categorie, photoUrl)
+    ): Annonce? {
+        val updated = catalogue.modifierAnnonce(
+            id, titre, description, prix, categorie, photoUrl
+        )
+        syncState()
+        return updated
+    }
 
-    override fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce? =
-        catalogue.changerEtat(id, nouvelEtat)
+    override suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce? {
+        val updated = catalogue.changerEtat(id, nouvelEtat)
+        syncState()
+        return updated
+    }
 
-    override fun removeListing(id: Int): Boolean =
-        catalogue.retirerAnnonce(id)
+    override suspend fun removeListing(id: Int): Boolean {
+        val removed = catalogue.retirerAnnonce(id)
+        if (removed) syncState()
+        return removed
+    }
+
+    private fun syncState() {
+        state.value = catalogue.toutesLesAnnonces().toList()
+    }
 }
