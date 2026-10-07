@@ -19,7 +19,7 @@ interface ListingRepository {
         categorie: Categorie,
         auteur: CompteUtilisateur,
         photoUrl: String? = null
-    ): Annonce
+    ): Result<Annonce>
 
     suspend fun updateListing(
         id: Int,
@@ -28,7 +28,7 @@ interface ListingRepository {
         prix: Double? = null,
         categorie: Categorie? = null,
         photoUrl: String? = null
-    ): Annonce?
+    ): Result<Annonce?>
 
     suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce?
 

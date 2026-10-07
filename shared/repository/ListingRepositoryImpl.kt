@@ -35,12 +35,20 @@ class ListingRepositoryImpl(
         categorie: Categorie,
         auteur: CompteUtilisateur,
         photoUrl: String?
-    ): Annonce {
+    ): Result<Annonce> {
+        val error = validate(titre, prix)
+        if (error != null) return Result.failure(IllegalArgumentException(error))
+
         val created = catalogue.publierAnnonce(
-            titre, description, prix, categorie, auteur, photoUrl
+            titre = titre.trim(),
+            description = description.trim(),
+            prix = prix,
+            categorie = categorie,
+            auteur = auteur,
+            photoUrl = photoUrl
         )
         syncState()
-        return created
+        return Result.success(created)
     }
 
     override suspend fun updateListing(
@@ -50,12 +58,15 @@ class ListingRepositoryImpl(
         prix: Double?,
         categorie: Categorie?,
         photoUrl: String?
-    ): Annonce? {
+    ): Result<Annonce?> {
+        val error = validate(titre, prix)
+        if (error != null) return Result.failure(IllegalArgumentException(error))
+
         val updated = catalogue.modifierAnnonce(
             id, titre, description, prix, categorie, photoUrl
         )
         syncState()
-        return updated
+        return Result.success(updated)
     }
 
     override suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Annonce? {
@@ -72,5 +83,11 @@ class ListingRepositoryImpl(
 
     private fun syncState() {
         state.value = catalogue.toutesLesAnnonces().toList()
+    }
+
+    private fun validate(titre: String?, prix: Double?): String? {
+        if (titre != null && titre.isBlank()) return "Title must not be empty"
+        if (prix != null && prix <= 0.0) return "Price must be greater than 0"
+        return null
     }
 }
