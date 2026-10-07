@@ -3,13 +3,19 @@ package com.isep.composeapp.ui.screens.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.isep.shared.domain.entities.Annonce
+import com.isep.shared.domain.entities.Disponible
 import com.isep.shared.domain.entities.EtatAnnonce
+import com.isep.shared.domain.entities.Reservee
+import com.isep.shared.domain.entities.Vendue
 import com.isep.shared.repository.AuthRepository
 import com.isep.shared.repository.ListingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 sealed interface DetailUiState {
     data object Loading : DetailUiState
@@ -46,15 +52,31 @@ class ListingDetailViewModel(
             _actionError.value = "You must be logged in"
             return
         }
-        changeStatus(listingId, com.isep.shared.domain.entities.Reservee(user.email))
+        changeStatus(listingId, Reservee(user.email))
     }
 
     fun markAsSold(listingId: Int) {
-        changeStatus(listingId, com.isep.shared.domain.entities.Vendue(kotlinx.datetime.Clock.System.now().toLocalDateTime(kotlinx.datetime.TimeZone.currentSystemDefault()).date))
+        val today = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+        changeStatus(listingId, Vendue(today))
     }
 
     fun cancel(listingId: Int) {
-        changeStatus(listingId, com.isep.shared.domain.entities.Disponible)
+        changeStatus(listingId, Disponible)
+    }
+
+    fun remove(listingId: Int, onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            listingRepository.removeListing(listingId)
+                .onSuccess {
+                    _actionError.value = null
+                    onDeleted()
+                }
+                .onFailure {
+                    _actionError.value = it.message ?: "Unknown error"
+                }
+        }
     }
 
     private fun changeStatus(listingId: Int, newStatus: EtatAnnonce) {

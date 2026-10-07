@@ -9,17 +9,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.isep.composeapp.di.AppContainer
+import com.isep.composeapp.ui.components.ConfirmDialog
 import com.isep.composeapp.ui.components.ErrorMessage
 import com.isep.composeapp.ui.components.LoadingIndicator
 import com.isep.shared.domain.entities.Disponible
@@ -31,6 +36,7 @@ import com.isep.shared.domain.entities.libelle
 fun ListingDetailScreen(
     listingId: Int,
     onEdit: (Int) -> Unit,
+    onDeleted: () -> Unit,
     viewModel: ListingDetailViewModel = viewModel {
         ListingDetailViewModel(
             listingRepository = AppContainer.listingRepository,
@@ -45,6 +51,8 @@ fun ListingDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val actionError by viewModel.actionError.collectAsStateWithLifecycle()
     val currentUser by AppContainer.authRepository.currentUser.collectAsStateWithLifecycle()
+
+    var showDeleteConfirm by remember { mutableStateOf(false) }
 
     when (val state = uiState) {
         is DetailUiState.Loading -> LoadingIndicator()
@@ -120,12 +128,38 @@ fun ListingDetailScreen(
                     ) {
                         Text("Edit")
                     }
+
+                    Spacer(Modifier.height(8.dp))
+                    Button(
+                        onClick = { showDeleteConfirm = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text("Delete")
+                    }
                 }
 
                 actionError?.let {
                     Spacer(Modifier.height(12.dp))
                     Text(it, color = MaterialTheme.colorScheme.error)
                 }
+            }
+
+            if (showDeleteConfirm) {
+                ConfirmDialog(
+                    title = "Delete listing",
+                    message = "This action is permanent. Do you want to delete \"${annonce.titre}\"?",
+                    confirmLabel = "Delete",
+                    dismissLabel = "Cancel",
+                    onConfirm = {
+                        viewModel.remove(annonce.id, onDeleted)
+                    },
+                    onDismiss = {
+                        showDeleteConfirm = false
+                    }
+                )
             }
         }
     }

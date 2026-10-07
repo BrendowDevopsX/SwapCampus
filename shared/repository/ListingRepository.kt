@@ -34,5 +34,5 @@ interface ListingRepository {
 
     suspend fun changeStatus(id: Int, nouvelEtat: EtatAnnonce): Result<Annonce>
 
-    suspend fun removeListing(id: Int): Boolean
+    suspend fun removeListing(id: Int): Result<Unit>
 }

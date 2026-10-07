@@ -38,7 +38,8 @@ fun SwapCampusNavHost(navController: NavHostController) {
             val listingId = backStackEntry.arguments?.getInt("listingId") ?: return@composable
             ListingDetailScreen(
                 listingId = listingId,
-                onEdit = { id -> navController.navigate(Routes.edit(id)) }
+                onEdit = { id -> navController.navigate(Routes.edit(id)) },
+                onDeleted = { navController.popBackStack() }
             )
         }
 

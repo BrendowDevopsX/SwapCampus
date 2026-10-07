@@ -92,10 +92,14 @@ class ListingRepositoryImpl(
         return Result.success(updated)
     }
 
-    override suspend fun removeListing(id: Int): Boolean {
+    override suspend fun removeListing(id: Int): Result<Unit> {
         val removed = catalogue.retirerAnnonce(id)
-        if (removed) syncState()
-        return removed
+        return if (removed) {
+            syncState()
+            Result.success(Unit)
+        } else {
+            Result.failure(NoSuchElementException("Listing not found: id=$id"))
+        }
     }
 
     private fun syncState() {

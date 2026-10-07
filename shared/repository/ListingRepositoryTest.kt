@@ -105,4 +105,20 @@ class ListingRepositoryTest {
         val result = repo.changeStatus(annonce.id, Reservee("carol@etu.fr"))
         assertTrue(result.isFailure)
     }
+
+    @Test
+    fun removeListing_removes_existing_listing() = runTest {
+        val repo = ListingRepositoryImpl()
+        val annonce = repo.postListing("Book", "d", 15.0, Categorie.LIVRES, auteur).getOrThrow()
+        val result = repo.removeListing(annonce.id)
+        assertTrue(result.isSuccess)
+        assertTrue(repo.getListingById(annonce.id) == null)
+    }
+
+    @Test
+    fun removeListing_fails_for_unknown_id() = runTest {
+        val repo = ListingRepositoryImpl()
+        val result = repo.removeListing(999)
+        assertTrue(result.isFailure)
+    }
 }
