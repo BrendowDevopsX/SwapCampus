@@ -29,3 +29,7 @@ Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:
 ---
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+=======
+# SwapCampus
+Develop_applic_mobile  
+>>>>>>> f49f9784540db96422cdc4fbe536d154df5a80f9
