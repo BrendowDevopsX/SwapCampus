@@ -1,4 +1,4 @@
-package com.isep.shared.domain
+package com.swapcampus.domain
 
 enum class RoleUtilisateur {
     ETUDIANT,

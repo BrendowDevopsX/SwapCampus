@@ -1,8 +1,7 @@
-package com.isep.shared.domain
-
-import com.isep.shared.domain.entities.Annonce
-import com.isep.shared.domain.entities.Disponible
-import com.isep.shared.domain.entities.libelle
+package com.swapcampus.domain
+import com.swapcampus.domain.Annonce
+import com.swapcampus.domain.Disponible
+import com.swapcampus.domain.libelle
 
 
 fun List<Annonce>.disponibles(): List<Annonce> =

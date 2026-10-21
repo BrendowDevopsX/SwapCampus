@@ -1,4 +1,4 @@
-package com.isep.shared.domain.entities
+package com.swapcampus.domain
 
 import kotlinx.datetime.LocalDate
 

@@ -1,10 +1,9 @@
-package com.isep.shared.domain
-
-import com.isep.shared.domain.entities.Annonce
-import com.isep.shared.domain.entities.Categorie
-import com.isep.shared.domain.entities.CompteUtilisateur
-import com.isep.shared.domain.entities.Disponible
-import com.isep.shared.domain.entities.EtatAnnonce
+package com.swapcampus.domain
+import com.swapcampus.domain.Annonce
+import com.swapcampus.domain.Categorie
+import com.swapcampus.domain.CompteUtilisateur
+import com.swapcampus.domain.Disponible
+import com.swapcampus.domain.EtatAnnonce
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

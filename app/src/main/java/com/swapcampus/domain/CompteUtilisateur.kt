@@ -1,6 +1,6 @@
-package com.isep.shared.domain.entities
+package com.swapcampus.domain
 
-import com.isep.shared.domain.RoleUtilisateur
+import com.swapcampus.domain.RoleUtilisateur
 import kotlinx.datetime.LocalDate
 
 data class CompteUtilisateur(
