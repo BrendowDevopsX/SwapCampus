@@ -1,0 +1,8 @@
+com.swapcampus.app-pngs-0 C:\cours\A4\SwapCampus\app\build\generated\res\pngs\debug
+com.swapcampus.app-updated_navigation_xml-1 C:\cours\A4\SwapCampus\app\build\generated\updated_navigation_xml\debug
+com.swapcampus.app-packageDebugResources-2 C:\cours\A4\SwapCampus\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.swapcampus.app-packageDebugResources-3 C:\cours\A4\SwapCampus\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.swapcampus.app-debug-4 C:\cours\A4\SwapCampus\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.swapcampus.app-debug-5 C:\cours\A4\SwapCampus\app\src\debug\res
+com.swapcampus.app-main-6 C:\cours\A4\SwapCampus\app\src\main\res
+gradleHome-0 C:\Users\laist\.gradle

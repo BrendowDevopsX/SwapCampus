@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.swapcampus"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.swapcampus"
@@ -48,7 +48,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
     implementation("androidx.navigation:navigation-compose:2.8.0")
 
-    // 显式指定 Kotlin 测试库坐标，绕过 AGP 9 对 kotlin() 辅助函数的解析问题
     testImplementation("org.jetbrains.kotlin:kotlin-test:2.2.10")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:2.2.10")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
