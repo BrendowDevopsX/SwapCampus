@@ -1,35 +1,41 @@
 package com.swapcampus.repository
 
-import com.swapcampus.domain.CatalogueAnnonces
 import com.swapcampus.domain.Annonce
+import com.swapcampus.domain.CatalogueAnnonces
 import com.swapcampus.domain.Categorie
 import com.swapcampus.domain.CompteUtilisateur
 import com.swapcampus.domain.Disponible
 import com.swapcampus.domain.EtatAnnonce
 import com.swapcampus.domain.Reservee
+import com.swapcampus.domain.StatistiquesVendeur
 import com.swapcampus.domain.Vendue
+import com.swapcampus.domain.filtrerPourRecherche
+import com.swapcampus.domain.statistiquesDe
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 
+/**
+ * Implémentation en mémoire du catalogue d'annonces.
+ *
+ * Expose l'état sous forme de [Flow] pour que les ViewModels observent les
+ * changements sans se soucier du stockage (cahier des charges §8.5).
+ *
+ * @param catalogue catalogue source, injectable pour les tests.
+ */
 class ListingRepositoryImpl(
     private val catalogue: CatalogueAnnonces = CatalogueAnnonces()
 ) : ListingRepository {
 
-    private val state = MutableStateFlow(catalogue.toutesLesAnnonces().toList())
+    private val state = MutableStateFlow(catalogue.toutesLesAnnonces())
 
     override fun allListings(): Flow<List<Annonce>> = state
 
     override fun searchListings(motCle: String?, categorie: Categorie?): Flow<List<Annonce>> =
-        state.map { list ->
-            list.filter { annonce ->
-                val matchesKeyword = motCle.isNullOrBlank() ||
-                        annonce.titre.contains(motCle, ignoreCase = true) ||
-                        annonce.description.contains(motCle, ignoreCase = true)
-                val matchesCategory = categorie == null || annonce.categorie == categorie
-                matchesKeyword && matchesCategory
-            }
-        }
+        state.map { annonces -> annonces.filtrerPourRecherche(motCle, categorie) }
+
+    override fun sellerStats(auteurId: Int): Flow<StatistiquesVendeur> =
+        state.map { annonces -> annonces.statistiquesDe(auteurId) }
 
     override suspend fun getListingById(id: Int): Annonce? =
         state.value.firstOrNull { it.id == id }
@@ -51,7 +57,7 @@ class ListingRepositoryImpl(
             prix = prix,
             categorie = categorie,
             auteur = auteur,
-            photoUrl = photoUrl
+            photoUrl = photoUrl?.trim()?.ifBlank { null }
         )
         syncState()
         return Result.success(created)
@@ -69,7 +75,12 @@ class ListingRepositoryImpl(
         if (error != null) return Result.failure(IllegalArgumentException(error))
 
         val updated = catalogue.modifierAnnonce(
-            id, titre, description, prix, categorie, photoUrl
+            id = id,
+            titre = titre?.trim(),
+            description = description,
+            prix = prix,
+            categorie = categorie,
+            photoUrl = photoUrl?.trim()?.ifBlank { null }
         )
         syncState()
         return Result.success(updated)
@@ -103,12 +114,12 @@ class ListingRepositoryImpl(
     }
 
     private fun syncState() {
-        state.value = catalogue.toutesLesAnnonces().toList()
+        state.value = catalogue.toutesLesAnnonces()
     }
 
     private fun validate(titre: String?, prix: Double?): String? {
-        if (titre != null && titre.isBlank()) return "Title must not be empty"
-        if (prix != null && prix <= 0.0) return "Price must be greater than 0"
+        if (titre != null && titre.isBlank()) return "Le titre ne doit pas être vide."
+        if (prix != null && prix <= 0.0) return "Le prix doit être supérieur à 0 €."
         return null
     }
 

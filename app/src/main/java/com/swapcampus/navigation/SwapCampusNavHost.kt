@@ -18,6 +18,14 @@ import com.swapcampus.ui.screens.mylistings.MyListingsScreen
 import com.swapcampus.ui.screens.post.PostListingScreen
 import com.swapcampus.ui.screens.profile.ProfileScreen
 
+/**
+ * Graphe de navigation de l'application.
+ *
+ * Le catalogue est accessible en anonyme ; la publication, la modification et
+ * l'espace vendeur exigent une connexion (§3.1). Après connexion, l'état
+ * d'authentification étant un [kotlinx.coroutines.flow.StateFlow] observé ici,
+ * l'écran protégé s'affiche automatiquement sans navigation supplémentaire.
+ */
 @Composable
 fun SwapCampusNavHost(
     navController: NavHostController,
@@ -39,7 +47,8 @@ fun SwapCampusNavHost(
         composable(Routes.MY_LISTINGS) {
             if (currentUser == null) {
                 LoginScreen(
-                    onLoginSuccess = { navController.popBackStack() }
+                    onLoginSuccess = { },
+                    onBack = { navController.popBackStack() }
                 )
             } else {
                 MyListingsScreen(
@@ -57,18 +66,21 @@ fun SwapCampusNavHost(
 
         composable(Routes.LOGIN) {
             LoginScreen(
-                onLoginSuccess = { navController.popBackStack() }
+                onLoginSuccess = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
             )
         }
 
         composable(Routes.POST) {
             if (currentUser == null) {
                 LoginScreen(
-                    onLoginSuccess = { navController.popBackStack() }
+                    onLoginSuccess = { },
+                    onBack = { navController.popBackStack() }
                 )
             } else {
                 PostListingScreen(
-                    onSuccess = { navController.popBackStack() }
+                    onSuccess = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() }
                 )
             }
         }
@@ -80,8 +92,10 @@ fun SwapCampusNavHost(
             val listingId = backStackEntry.arguments?.getInt("listingId") ?: return@composable
             ListingDetailScreen(
                 listingId = listingId,
-                onEdit = { id -> navController.navigate(Routes.edit(id)) },
-                onDeleted = { navController.popBackStack() }
+                onEdit = { navController.navigate(Routes.edit(listingId)) },
+                onDeleted = { navController.popBackStack() },
+                onBack = { navController.popBackStack() },
+                onLogin = { navController.navigate(Routes.LOGIN) }
             )
         }
 
@@ -92,12 +106,14 @@ fun SwapCampusNavHost(
             val listingId = backStackEntry.arguments?.getInt("listingId") ?: return@composable
             if (currentUser == null) {
                 LoginScreen(
-                    onLoginSuccess = { navController.popBackStack() }
+                    onLoginSuccess = { },
+                    onBack = { navController.popBackStack() }
                 )
             } else {
                 EditListingScreen(
                     listingId = listingId,
-                    onSuccess = { navController.popBackStack() }
+                    onSuccess = { navController.popBackStack() },
+                    onBack = { navController.popBackStack() }
                 )
             }
         }

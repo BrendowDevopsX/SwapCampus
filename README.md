@@ -33,18 +33,54 @@ démarrage par snapshot rapide corrompu, pas un bug du projet. Correctif :
 `Tools > Device Manager` → `⋮` sur l'AVD → **Cold Boot Now**.
 Pour éviter que cela se reproduise : `Edit` l'AVD → *Boot option* = **Cold boot**.
 
-## Structure du code
+## Fonctionnalités (Lab 1 / TP1)
 
-- `app/src/main/java/com/swapcampus/ui/` — écrans et composants Compose, ViewModels
-- `app/src/main/java/com/swapcampus/domain/` — entités et catalogue en mémoire
-- `app/src/main/java/com/swapcampus/repository/` — dépôts (annonces, authentification)
+| Cas d'utilisation | Où |
+|---|---|
+| UC1 — publier une annonce | FAB « + » ou bouton de l'en-tête « Mes annonces » → formulaire (titre, description, prix, catégorie, photo URL facultative) |
+| UC2 — parcourir | Onglet « Annonces » : cartes avec illustration de catégorie, statut, prix, vendeur ; seules les annonces **disponibles** sont listées |
+| UC3 — rechercher / filtrer | Champ de recherche (titre et description) + puces de catégorie ; état vide explicite avec bouton « Réinitialiser » |
+| UC4 — modifier | Fiche de l'annonce → « Modifier » (propriétaire uniquement ; une annonce vendue doit être republiée) |
+| UC5 — cycle d'état | Fiche → « Réserver à un acheteur » (nom obligatoire) → « Marquer comme vendue » ; « Annuler la réservation » et « Remettre en vente » |
+| UC6 — supprimer | Fiche → icône corbeille, avec confirmation (propriétaire uniquement) |
+| UC7 — statistiques vendeur | Onglet « Mes annonces » : publiées / en ligne / réservées / vendues, plus les mêmes chiffres sur le profil |
+| Connexion | Onglet « Profil » ou toute action protégée ; comptes de démonstration cliquables sur l'écran de connexion |
+
+Comptes de démonstration (mot de passe entre parenthèses) :
+
+- `alice@etu.fr` (alice123) — 4 annonces
+- `bob@etu.fr` (bob123) — 4 annonces
+- `admin@swapcampus.fr` (admin123) — administrateur
+
+## Architecture
+
+- `app/src/main/java/com/swapcampus/ui/` — écrans Compose, composants, ViewModels (MVVM)
+- `app/src/main/java/com/swapcampus/domain/` — entités, états, catalogue en mémoire, règles métier
+- `app/src/main/java/com/swapcampus/data/` — jeu de données de démonstration
+- `app/src/main/java/com/swapcampus/repository/` — dépôts (annonces, authentification), exposés en `Flow`
 - `app/src/main/java/com/swapcampus/navigation/` — routes et NavHost
 - `app/src/main/java/com/swapcampus/di/AppContainer.kt` — injection de dépendances manuelle
 - `app/src/main/java/com/isep/shared/domain/` — ancien package domaine, encore présent (doublon à fusionner)
-- `app/src/test/` — tests unitaires du dépôt d'annonces
+- `app/src/test/` — tests unitaires (domaine, dépôt d'annonces, authentification)
+- `app/src/androidTest/` — test d'interface du parcours de publication
+
+## Tests
+
+```bash
+# Tests unitaires JVM (domaine + dépôts)
+./gradlew :app:testDebugUnitTest
+
+# Tests d'interface sur un émulateur ou un appareil connecté
+./gradlew :app:connectedDebugAndroidTest
+```
+
+Les règles métier sont vérifiées côté domaine : validation du titre et du prix, transitions
+`Disponible → Réservée → Vendue` (et retour), filtre des annonces non disponibles dans le
+catalogue, statistiques du vendeur.
 
 ## État des données
 
-Les annonces sont stockées en mémoire (`CatalogueAnnonces`) et la liste est vide au démarrage :
-l'écran Liste affiche donc « No listings match your search » tant qu'aucune annonce n'a été
-publiée. Il n'y a ni backend ni base de données à ce stade.
+Les annonces sont stockées en mémoire (`CatalogueAnnonces`) et amorcées avec huit annonces de
+démonstration (`EchantillonDonnees`) couvrant les trois états et plusieurs catégories, pour que la
+démonstration ne démarre pas sur un écran vide. Rien n'est persisté : tout repart à zéro au
+prochain lancement (cahier des charges §8.3, le stockage local arrive au TP2).

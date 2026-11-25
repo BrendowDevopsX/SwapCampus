@@ -2,62 +2,70 @@ package com.swapcampus.ui.screens.listings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swapcampus.di.AppContainer
 import com.swapcampus.domain.Annonce
 import com.swapcampus.domain.Categorie
 import com.swapcampus.repository.ListingRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
-sealed interface ListingsUiState {
-    data object Loading : ListingsUiState
-    data class Success(val listings: List<Annonce>) : ListingsUiState
-    data class Error(val message: String) : ListingsUiState
-}
-
+/**
+ * État du catalogue (UC2 + UC3) : recherche par mot-clé et filtre par
+ * catégorie, appliqués en continu sur le flux du dépôt.
+ */
 class ListingsViewModel(
-    private val repository: ListingRepository
+    private val repository: ListingRepository = AppContainer.listingRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<ListingsUiState>(ListingsUiState.Loading)
-    val uiState: StateFlow<ListingsUiState> = _uiState.asStateFlow()
+    sealed interface ListingsUiState {
+        data object Loading : ListingsUiState
+        data class Success(val annonces: List<Annonce>) : ListingsUiState
+        data class Error(val message: String) : ListingsUiState
+    }
 
     private val _keyword = MutableStateFlow("")
     val keyword: StateFlow<String> = _keyword.asStateFlow()
 
-    private val _category = MutableStateFlow<Categorie?>(null)
-    val category: StateFlow<Categorie?> = _category.asStateFlow()
+    private val _categorie = MutableStateFlow<Categorie?>(null)
+    val categorie: StateFlow<Categorie?> = _categorie.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            combine(_keyword, _category) { kw, cat -> kw to cat }
-                .collect { (kw, cat) ->
-                    loadListings(kw, cat)
-                }
-        }
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val uiState: StateFlow<ListingsUiState> = combine(_keyword, _categorie) { motCle, categorie ->
+        motCle.trim().ifEmpty { null } to categorie
     }
-
-    fun onKeywordChange(value: String) {
-        _keyword.value = value
-    }
-
-    fun onCategoryChange(value: Categorie?) {
-        _category.value = value
-    }
-
-    private suspend fun loadListings(keyword: String, category: Categorie?) {
-        _uiState.value = ListingsUiState.Loading
-        try {
-            repository.searchListings(
-                motCle = keyword.ifBlank { null },
-                categorie = category
-            ).collect { listings ->
-                _uiState.value = ListingsUiState.Success(listings)
+        .flatMapLatest { (motCle, categorie) ->
+            repository.searchListings(motCle, categorie).map { annonces ->
+                ListingsUiState.Success(annonces) as ListingsUiState
             }
-        } catch (e: Exception) {
-            _uiState.value = ListingsUiState.Error(e.message ?: "Unknown error")
         }
+        .catch { erreur ->
+            emit(ListingsUiState.Error(erreur.message ?: "Impossible de charger les annonces"))
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = ListingsUiState.Loading
+        )
+
+    fun onKeywordChange(nouveau: String) {
+        _keyword.value = nouveau
+    }
+
+    fun onCategorieChange(categorie: Categorie?) {
+        _categorie.value = categorie
+    }
+
+    /** Remet à zéro la recherche et le filtre (bouton « Réinitialiser »). */
+    fun reinitialiserFiltres() {
+        _keyword.value = ""
+        _categorie.value = null
     }
 }

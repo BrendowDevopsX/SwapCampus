@@ -1,20 +1,28 @@
 package com.swapcampus.domain
-import com.swapcampus.domain.Annonce
-import com.swapcampus.domain.Categorie
-import com.swapcampus.domain.CompteUtilisateur
-import com.swapcampus.domain.Disponible
-import com.swapcampus.domain.EtatAnnonce
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
-class CatalogueAnnonces {
+/**
+ * Catalogue en mémoire : source de vérité des annonces pour le TP1
+ * (pas de base de données, voir cahier des charges §8.3).
+ *
+ * La classe ne connaît ni Compose ni Android : elle peut être testée en
+ * JVM pur, puis réutilisée telle quelle dans le module partagé KMP.
+ *
+ * @param annoncesInitiales annonces de départ (jeu de démonstration), vide par défaut.
+ */
+class CatalogueAnnonces(
+    annoncesInitiales: List<Annonce> = emptyList()
+) {
 
-    private val annonces = mutableListOf<Annonce>()
-    private var prochainId = 1
+    private val annonces: MutableList<Annonce> = annoncesInitiales.toMutableList()
+    private var prochainId: Int = (annoncesInitiales.maxOfOrNull { it.id } ?: 0) + 1
 
-    fun toutesLesAnnonces(): List<Annonce> = annonces
+    /** Toutes les annonces, quel que soit leur état. */
+    fun toutesLesAnnonces(): List<Annonce> = annonces.toList()
 
+    /**
+     * Publie une annonce (UC1) : l'auteur est rattaché automatiquement,
+     * la date est celle du jour et l'état initial est [Disponible].
+     */
     fun publierAnnonce(
         titre: String,
         description: String,
@@ -34,26 +42,21 @@ class CatalogueAnnonces {
             etat = Disponible,
             dateCreation = aujourdHui()
         )
-
-        return nouvelleAnnonce.also {
-            annonces.add(it)
-            prochainId++
-            println("Annonce publiée : ${it.titre} (id=${it.id})")
-        }
+        annonces.add(nouvelleAnnonce)
+        prochainId++
+        return nouvelleAnnonce
     }
 
+    /**
+     * Recherche du catalogue public (UC2 + UC3) : uniquement des annonces
+     * disponibles, filtrées par mot-clé et/ou catégorie.
+     */
     fun rechercherAnnonces(
         motCle: String? = null,
         categorie: Categorie? = null
-    ): List<Annonce> = annonces
-        .disponibles()
-        .filter { annonce ->
-            (motCle == null ||
-                annonce.titre.contains(motCle, ignoreCase = true) ||
-                annonce.description.contains(motCle, ignoreCase = true)) &&
-                (categorie == null || annonce.categorie == categorie)
-        }
+    ): List<Annonce> = annonces.filtrerPourRecherche(motCle, categorie)
 
+    /** Met à jour les champs fournis (UC4). */
     fun modifierAnnonce(
         id: Int,
         titre: String? = null,
@@ -76,15 +79,13 @@ class CatalogueAnnonces {
         return miseAJour
     }
 
+    /** Applique une transition d'état déjà validée (UC5). */
     fun changerEtat(id: Int, nouvelEtat: EtatAnnonce): Annonce? {
         val index = annonces.indexOfFirst { it.id == id }
         if (index == -1) return null
         return annonces[index].copy(etat = nouvelEtat).also { annonces[index] = it }
     }
 
+    /** Retire définitivement une annonce (UC6). */
     fun retirerAnnonce(id: Int): Boolean = annonces.removeAll { it.id == id }
 }
-
-/** Date du jour, en `kotlinx.datetime.LocalDate` (portable Android/iOS). */
-private fun aujourdHui() =
-    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
