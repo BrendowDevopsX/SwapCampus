@@ -2,8 +2,10 @@ package com.swapcampus.ui.screens.edit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swapcampus.di.AppContainer
 import com.swapcampus.domain.Annonce
 import com.swapcampus.domain.Categorie
+import com.swapcampus.domain.Vendue
 import com.swapcampus.repository.AuthRepository
 import com.swapcampus.repository.ListingRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,9 +19,13 @@ sealed interface EditUiState {
     data class Error(val message: String) : EditUiState
 }
 
+/**
+ * Modification d'annonce (UC4) : réservée au propriétaire, et interdite sur une
+ * annonce déjà vendue (il faut la republier).
+ */
 class EditListingViewModel(
-    private val listingRepository: ListingRepository,
-    private val authRepository: AuthRepository
+    private val listingRepository: ListingRepository = AppContainer.listingRepository,
+    private val authRepository: AuthRepository = AppContainer.authRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<EditUiState>(EditUiState.Loading)
@@ -32,20 +38,27 @@ class EditListingViewModel(
         viewModelScope.launch {
             _uiState.value = EditUiState.Loading
 
-            val user = authRepository.currentUser.value
-            if (user == null) {
-                _uiState.value = EditUiState.Error("You must be logged in")
+            val utilisateur = authRepository.currentUser.value
+            if (utilisateur == null) {
+                _uiState.value = EditUiState.Error("Connectez-vous pour modifier une annonce.")
                 return@launch
             }
 
             val annonce = listingRepository.getListingById(listingId)
             if (annonce == null) {
-                _uiState.value = EditUiState.Error("Listing not found")
+                _uiState.value = EditUiState.Error("Cette annonce n'existe plus.")
                 return@launch
             }
 
-            if (annonce.auteur.id != user.id) {
-                _uiState.value = EditUiState.Error("You are not the owner of this listing")
+            if (annonce.auteur.id != utilisateur.id) {
+                _uiState.value = EditUiState.Error("Vous n'êtes pas le propriétaire de cette annonce.")
+                return@launch
+            }
+
+            if (annonce.etat is Vendue) {
+                _uiState.value = EditUiState.Error(
+                    "Une annonce vendue ne peut plus être modifiée : republiez-la pour la remettre en vente."
+                )
                 return@launch
             }
 
@@ -61,12 +74,12 @@ class EditListingViewModel(
         photoUrl: String?,
         onSuccess: () -> Unit
     ) {
-        val current = _uiState.value
-        if (current !is EditUiState.Ready) return
+        val courant = _uiState.value
+        if (courant !is EditUiState.Ready) return
 
         viewModelScope.launch {
             listingRepository.updateListing(
-                id = current.annonce.id,
+                id = courant.annonce.id,
                 titre = titre,
                 description = description,
                 prix = prix,
@@ -76,8 +89,12 @@ class EditListingViewModel(
                 _submitError.value = null
                 onSuccess()
             }.onFailure {
-                _submitError.value = it.message ?: "Unknown error"
+                _submitError.value = it.message ?: "Enregistrement impossible."
             }
         }
+    }
+
+    fun clearError() {
+        _submitError.value = null
     }
 }

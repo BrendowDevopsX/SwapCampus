@@ -12,3 +12,9 @@ data class CompteUtilisateur(
     val role: RoleUtilisateur,
     val actif: Boolean = true
 )
+
+/** Libellé affichable du rôle, utilisé dans le profil et l'écran de connexion. */
+fun RoleUtilisateur.libelle(): String = when (this) {
+    RoleUtilisateur.ETUDIANT -> "Étudiant"
+    RoleUtilisateur.ADMINISTRATEUR -> "Administrateur"
+}
