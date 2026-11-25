@@ -54,7 +54,7 @@ Comptes de démonstration (mot de passe entre parenthèses) :
 
 ## Architecture
 
-- `shared/ui` — écrans Compose, composants, ViewModels (MVVM)
+- `composeApp/androidMain/ui` — écrans Compose, composants, ViewModels (MVVM)
 - `shared/commonMain/domain` — entités, états, catalogue en mémoire, règles métier
 - `app/src/main/java/com/swapcampus/data/` — jeu de données de démonstration
 - `shared/commonMain/repository` — dépôts (annonces, authentification), exposés en `Flow`
