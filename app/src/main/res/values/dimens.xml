@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Dimensions partagées par les écrans (§10.2 : les tailles viennent de
+    ressources, pas de valeurs écrites en dur dans les écrans).
+-->
+<resources>
+    <dimen name="espace_ecran">20dp</dimen>
+    <dimen name="espace_section">24dp</dimen>
+    <dimen name="espace_petit">8dp</dimen>
+    <dimen name="coin_carte">18dp</dimen>
+    <dimen name="coin_bouton">14dp</dimen>
+    <dimen name="hauteur_bouton">52dp</dimen>
+    <dimen name="taille_vignette">92dp</dimen>
+    <dimen name="taille_avatar">72dp</dimen>
+    <dimen name="taille_icone_rond">44dp</dimen>
+    <dimen name="marge_bas_liste">96dp</dimen>
+</resources>

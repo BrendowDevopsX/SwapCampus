@@ -8,8 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.sp
+import com.swapcampus.R
 
 /**
  * Champ de recherche du catalogue (UC3).
@@ -22,7 +24,7 @@ fun SearchField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Rechercher un objet, une catégorie…"
+    placeholder: String = stringResource(R.string.listings_recherche)
 ) {
     OutlinedTextField(
         value = value,

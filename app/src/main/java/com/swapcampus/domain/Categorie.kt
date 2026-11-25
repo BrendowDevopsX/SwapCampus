@@ -1,5 +1,10 @@
 package com.swapcampus.domain
 
+/**
+ * Catégories d'annonces. Le libellé affiché est fourni par la couche UI
+ * (`com.swapcampus.ui.text.resCategorie`) : le domaine ne contient aucun texte
+ * traduisible (§10.2).
+ */
 enum class Categorie {
     LIVRES,
     COURS,
@@ -8,14 +13,4 @@ enum class Categorie {
     MOBILIER,
     VETEMENTS,
     AUTRE
-}
-
-fun Categorie.libelle(): String = when (this) {
-    Categorie.LIVRES -> "Livres"
-    Categorie.COURS -> "Cours"
-    Categorie.ELECTRONIQUE -> "Électronique"
-    Categorie.SPORT_LOISIRS -> "Sport & loisirs"
-    Categorie.MOBILIER -> "Mobilier"
-    Categorie.VETEMENTS -> "Vêtements"
-    Categorie.AUTRE -> "Autre"
 }

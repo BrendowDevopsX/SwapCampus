@@ -13,15 +13,15 @@ import kotlinx.coroutines.launch
 
 /**
  * Création d'annonce (UC1). Les règles métier (titre non vide, prix > 0) sont
- * vérifiées par le dépôt ; l'écran ne fait que remonter le message d'erreur.
+ * vérifiées dans le domaine ; l'écran ne fait que remonter l'erreur obtenue.
  */
 class PostListingViewModel(
     private val listingRepository: ListingRepository = AppContainer.listingRepository,
     private val authRepository: AuthRepository = AppContainer.authRepository
 ) : ViewModel() {
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    private val _erreur = MutableStateFlow<Throwable?>(null)
+    val erreur: StateFlow<Throwable?> = _erreur.asStateFlow()
 
     private val _enregistrement = MutableStateFlow(false)
     val enregistrement: StateFlow<Boolean> = _enregistrement.asStateFlow()
@@ -36,7 +36,7 @@ class PostListingViewModel(
     ) {
         val utilisateur = authRepository.currentUser.value
         if (utilisateur == null) {
-            _error.value = "Connectez-vous pour publier une annonce."
+            _erreur.value = IllegalStateException("connexion requise")
             return
         }
 
@@ -50,16 +50,16 @@ class PostListingViewModel(
                 auteur = utilisateur,
                 photoUrl = photoUrl
             ).onSuccess {
-                _error.value = null
+                _erreur.value = null
                 onSuccess()
             }.onFailure {
-                _error.value = it.message ?: "Publication impossible."
+                _erreur.value = it
             }
             _enregistrement.value = false
         }
     }
 
     fun clearError() {
-        _error.value = null
+        _erreur.value = null
     }
 }

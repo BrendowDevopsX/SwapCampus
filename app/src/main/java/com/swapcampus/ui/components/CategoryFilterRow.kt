@@ -19,9 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.swapcampus.R
 import com.swapcampus.domain.Categorie
-import com.swapcampus.domain.libelle
+import com.swapcampus.ui.text.libelle
 import com.swapcampus.ui.theme.style
 
 /**
@@ -96,7 +98,7 @@ fun CategoryFilterRow(
     ) {
         item(key = "toutes") {
             PuceFiltre(
-                libelle = "Tout",
+                libelle = stringResource(R.string.filtre_tout),
                 selectionne = selection == null,
                 onClick = { onSelection(null) },
                 glyphe = "🛍️",

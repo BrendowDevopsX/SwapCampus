@@ -4,6 +4,8 @@ import com.swapcampus.data.EchantillonDonnees
 import com.swapcampus.domain.CatalogueAnnonces
 import com.swapcampus.repository.AuthRepository
 import com.swapcampus.repository.AuthRepositoryImpl
+import com.swapcampus.repository.FavorisRepository
+import com.swapcampus.repository.FavorisRepositoryImpl
 import com.swapcampus.repository.ListingRepository
 import com.swapcampus.repository.ListingRepositoryImpl
 
@@ -19,4 +21,7 @@ object AppContainer {
     val listingRepository: ListingRepository by lazy {
         ListingRepositoryImpl(CatalogueAnnonces(EchantillonDonnees.annoncesDemo()))
     }
+
+    /** Favoris en mémoire, par utilisateur. */
+    val favorisRepository: FavorisRepository by lazy { FavorisRepositoryImpl() }
 }

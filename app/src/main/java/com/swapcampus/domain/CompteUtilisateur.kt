@@ -1,8 +1,11 @@
 package com.swapcampus.domain
 
-import com.swapcampus.domain.RoleUtilisateur
 import kotlinx.datetime.LocalDate
 
+/**
+ * Compte utilisateur simplifié du TP1 : pas de hachage réel, les comptes sont
+ * fournis par le jeu de démonstration (§8.2).
+ */
 data class CompteUtilisateur(
     val id: Int,
     val nom: String,
@@ -12,9 +15,3 @@ data class CompteUtilisateur(
     val role: RoleUtilisateur,
     val actif: Boolean = true
 )
-
-/** Libellé affichable du rôle, utilisé dans le profil et l'écran de connexion. */
-fun RoleUtilisateur.libelle(): String = when (this) {
-    RoleUtilisateur.ETUDIANT -> "Étudiant"
-    RoleUtilisateur.ADMINISTRATEUR -> "Administrateur"
-}

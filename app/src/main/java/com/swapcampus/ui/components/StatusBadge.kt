@@ -22,19 +22,13 @@ import com.swapcampus.domain.Disponible
 import com.swapcampus.domain.EtatAnnonce
 import com.swapcampus.domain.Reservee
 import com.swapcampus.domain.Vendue
+import com.swapcampus.ui.text.libelleCourt
 import com.swapcampus.ui.theme.DisponibleFond
 import com.swapcampus.ui.theme.DisponibleTexte
 import com.swapcampus.ui.theme.ReserveeFond
 import com.swapcampus.ui.theme.ReserveeTexte
 import com.swapcampus.ui.theme.VendueFond
 import com.swapcampus.ui.theme.VendueTexte
-
-/** Libellé court d'un état, sans l'acheteur ni la date (version longue : [libelle]). */
-fun EtatAnnonce.libelleCourt(): String = when (this) {
-    is Disponible -> "Disponible"
-    is Reservee -> "Réservée"
-    is Vendue -> "Vendue"
-}
 
 private fun EtatAnnonce.couleurs(): Pair<Color, Color> = when (this) {
     is Disponible -> DisponibleFond to DisponibleTexte

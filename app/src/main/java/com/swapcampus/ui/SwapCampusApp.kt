@@ -1,5 +1,6 @@
 package com.swapcampus.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,19 +22,21 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.swapcampus.R
 import com.swapcampus.navigation.Routes
 import com.swapcampus.navigation.SwapCampusNavHost
 
 private data class BottomItem(
     val route: String,
-    val label: String,
+    @StringRes val libelle: Int,
     val glyphe: String
 )
 
 private val bottomItems = listOf(
-    BottomItem(Routes.LISTINGS, "Annonces", "🏷️"),
-    BottomItem(Routes.MY_LISTINGS, "Mes annonces", "📦"),
-    BottomItem(Routes.PROFILE, "Profil", "👤")
+    BottomItem(Routes.LISTINGS, R.string.nav_annonces, "🏷️"),
+    BottomItem(Routes.MY_LISTINGS, R.string.nav_mes_annonces, "📦"),
+    BottomItem(Routes.FAVORIS, R.string.nav_favoris, "❤️"),
+    BottomItem(Routes.PROFILE, R.string.nav_profil, "👤")
 )
 
 /** Routes en plein écran : ni barre de navigation ni bouton flottant. */
@@ -43,6 +47,9 @@ private val routesPleinEcran = setOf(
     Routes.LOGIN
 )
 
+/** Onglets qui possèdent déjà leur propre bouton de publication. */
+private val routesSansFab = setOf(Routes.MY_LISTINGS, Routes.FAVORIS)
+
 /** Racine de l'application : coquille (barre de navigation + FAB) et graphe de navigation. */
 @Composable
 fun SwapCampusApp() {
@@ -51,7 +58,7 @@ fun SwapCampusApp() {
     val currentRoute = backStackEntry?.destination?.route
     val pleinEcran = currentRoute != null && currentRoute in routesPleinEcran
     // « Mes annonces » possède déjà son propre bouton de publication dans l'en-tête.
-    val afficherFab = !pleinEcran && currentRoute != Routes.MY_LISTINGS
+    val afficherFab = !pleinEcran && currentRoute !in routesSansFab
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -113,7 +120,7 @@ private fun BottomBar(navController: NavHostController) {
                         fontSize = 17.sp
                     )
                 },
-                label = { Text(item.label) },
+                label = { Text(stringResource(item.libelle)) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.primary,
                     selectedTextColor = MaterialTheme.colorScheme.primary,

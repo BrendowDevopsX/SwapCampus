@@ -33,18 +33,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swapcampus.R
 import com.swapcampus.domain.CompteUtilisateur
-import com.swapcampus.domain.libelle
 import com.swapcampus.ui.components.SectionTitle
 import com.swapcampus.ui.components.initiales
-import androidx.compose.ui.unit.sp
+import com.swapcampus.ui.text.libelle
 
 /**
  * Écran de connexion. La publication et la modification d'annonces exigent un
@@ -59,7 +61,7 @@ fun LoginScreen(
 ) {
     val email by viewModel.email.collectAsStateWithLifecycle()
     val motDePasse by viewModel.motDePasse.collectAsStateWithLifecycle()
-    val erreur by viewModel.error.collectAsStateWithLifecycle()
+    val erreur by viewModel.erreur.collectAsStateWithLifecycle()
     val chargement by viewModel.chargement.collectAsStateWithLifecycle()
 
     var motDePasseVisible by remember { mutableStateOf(false) }
@@ -96,7 +98,7 @@ fun LoginScreen(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            text = "Bon retour 👋",
+            text = stringResource(R.string.login_titre),
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -104,7 +106,7 @@ fun LoginScreen(
         Spacer(Modifier.height(6.dp))
 
         Text(
-            text = "Connectez-vous pour publier une annonce, réserver un objet et suivre vos ventes.",
+            text = stringResource(R.string.login_sous_titre),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -117,8 +119,8 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("champ_email"),
-            label = { Text("Email ISEP") },
-            placeholder = { Text("prenom.nom@etu.fr") },
+            label = { Text(stringResource(R.string.login_email)) },
+            placeholder = { Text(stringResource(R.string.login_email_placeholder)) },
             singleLine = true,
             shape = MaterialTheme.shapes.medium,
             keyboardOptions = KeyboardOptions(
@@ -135,7 +137,7 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("champ_mot_de_passe"),
-            label = { Text("Mot de passe") },
+            label = { Text(stringResource(R.string.login_mot_de_passe)) },
             singleLine = true,
             shape = MaterialTheme.shapes.medium,
             leadingIcon = {
@@ -144,7 +146,13 @@ fun LoginScreen(
             trailingIcon = {
                 TextButton(onClick = { motDePasseVisible = !motDePasseVisible }) {
                     Text(
-                        text = if (motDePasseVisible) "Masquer" else "Afficher",
+                        text = stringResource(
+                            if (motDePasseVisible) {
+                                R.string.login_masquer
+                            } else {
+                                R.string.login_afficher
+                            }
+                        ),
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -163,10 +171,11 @@ fun LoginScreen(
             )
         )
 
-        if (erreur != null) {
+        val erreurRes = erreur
+        if (erreurRes != null) {
             Spacer(Modifier.height(10.dp))
             Text(
-                text = erreur.orEmpty(),
+                text = stringResource(erreurRes),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.error
             )
@@ -190,15 +199,18 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Se connecter", style = MaterialTheme.typography.labelLarge)
+                Text(
+                    text = stringResource(R.string.login_action),
+                    style = MaterialTheme.typography.labelLarge
+                )
             }
         }
 
         Spacer(Modifier.height(36.dp))
 
         SectionTitle(
-            titre = "Comptes de démonstration",
-            secondaire = "toucher pour remplir"
+            titre = stringResource(R.string.login_comptes_demo),
+            secondaire = stringResource(R.string.login_comptes_demo_aide)
         )
 
         Spacer(Modifier.height(10.dp))

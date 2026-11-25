@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English translation (cahier des charges §8.7). -->
+<resources>
+
+    <!-- Generic actions -->
+    <string name="action_retour">Back</string>
+    <string name="action_annuler">Cancel</string>
+    <string name="action_supprimer">Delete</string>
+    <string name="action_modifier">Edit</string>
+    <string name="action_fermer">Close</string>
+    <string name="cd_retour">Back</string>
+    <string name="cd_modifier">Edit</string>
+    <string name="cd_supprimer">Delete</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_annonces">Listings</string>
+    <string name="nav_mes_annonces">My listings</string>
+    <string name="nav_favoris">Favourites</string>
+    <string name="nav_profil">Profile</string>
+    <string name="cd_publier">Post a listing</string>
+
+    <!-- Catalogue -->
+    <string name="listings_sous_titre">Good deals between two classes.</string>
+    <string name="listings_recherche">Search an item, a category…</string>
+    <string name="listings_section">Featured</string>
+    <plurals name="listings_nb_annonces">
+        <item quantity="one">%d listing</item>
+        <item quantity="other">%d listings</item>
+    </plurals>
+    <string name="listings_vide_titre">No results</string>
+    <string name="listings_vide_message">No listing matches this search. Try another keyword, category or price range.</string>
+    <string name="listings_vide_action">Reset</string>
+    <string name="listings_catalogue_vide_titre">Campus is quiet…</string>
+    <string name="listings_catalogue_vide_message">No listing available yet. Be the first to sell something!</string>
+    <string name="listings_erreur">Unable to load listings</string>
+
+    <!-- Price filter -->
+    <string name="filtre_tout">All</string>
+    <string name="filtre_prix_bouton">Price</string>
+    <string name="filtre_prix_titre">Price range</string>
+    <string name="filtre_prix_min">Minimum</string>
+    <string name="filtre_prix_max">Maximum</string>
+    <string name="filtre_prix_appliquer">Apply</string>
+    <string name="filtre_prix_effacer">Clear</string>
+    <string name="filtre_prix_resume">%1$s – %2$s</string>
+
+    <!-- Categories -->
+    <string name="categorie_livres">Books</string>
+    <string name="categorie_cours">Tutoring</string>
+    <string name="categorie_electronique">Electronics</string>
+    <string name="categorie_sport">Sport &amp; leisure</string>
+    <string name="categorie_mobilier">Furniture</string>
+    <string name="categorie_vetements">Clothing</string>
+    <string name="categorie_autre">Other</string>
+
+    <!-- Listing states -->
+    <string name="etat_disponible">Available</string>
+    <string name="etat_reservee">Reserved</string>
+    <string name="etat_vendue">Sold</string>
+    <string name="etat_reservee_par">Reserved by %1$s</string>
+    <string name="etat_vendue_le">Sold on %1$s</string>
+    <string name="etat_disponible_message">This listing is available: reserve it or contact the seller.</string>
+
+    <!-- Roles -->
+    <string name="role_etudiant">Student</string>
+    <string name="role_administrateur">Administrator</string>
+
+    <!-- Listing card -->
+    <string name="carte_vendeur_date">%1$s · %2$s</string>
+    <string name="carte_favori_ajouter">Add to favourites</string>
+    <string name="carte_favori_retirer">Remove from favourites</string>
+    <string name="carte_photo_description">Listing photo</string>
+
+    <!-- Listing form -->
+    <string name="champ_titre">Title</string>
+    <string name="champ_titre_placeholder">E.g. Kotlin in Action, 2nd edition</string>
+    <string name="champ_description">Description</string>
+    <string name="champ_description_placeholder">Condition, edition, reason for selling…</string>
+    <string name="champ_prix">Price (€)</string>
+    <string name="champ_categorie">Category</string>
+    <string name="champ_photo">Photo (optional)</string>
+    <string name="champ_photo_placeholder">Link to an image</string>
+    <string name="champ_photo_aide">Pick a photo from your gallery or paste a link.</string>
+    <string name="photo_choisir">Choose a photo</string>
+    <string name="photo_retirer">Remove</string>
+
+    <!-- Listing detail -->
+    <string name="detail_introuvable_titre">Listing not found</string>
+    <string name="detail_introuvable_message">This listing no longer exists.</string>
+    <string name="detail_retour_catalogue">Back to catalogue</string>
+    <string name="detail_description">Description</string>
+    <string name="detail_sans_description">No description provided.</string>
+    <string name="detail_publiee_le">Posted on %1$s</string>
+    <string name="detail_reservee_pour">Reserved for %1$s</string>
+    <string name="detail_supprimer_titre">Delete this listing?</string>
+    <string name="detail_supprimer_message">“%1$s” will be permanently removed from the catalogue.</string>
+    <string name="detail_reserver_titre">Reserve the listing</string>
+    <string name="detail_reserver_message">Enter the buyer\'s name: the listing will be marked “Reserved” and hidden from the catalogue.</string>
+    <string name="detail_reserver_champ">Buyer name</string>
+    <string name="detail_reserver_action">Reserve</string>
+    <string name="detail_reserver_vendeur">Reserve for a buyer</string>
+    <string name="detail_vendre">Mark as sold</string>
+    <string name="detail_annuler_reservation">Cancel reservation</string>
+    <string name="detail_remettre_en_vente">Put back on sale</string>
+    <string name="detail_republier">Repost the listing</string>
+    <string name="detail_contacter_titre">Contact the seller</string>
+    <string name="detail_contacter_message">%1$s can be reached at:</string>
+    <string name="detail_contacter">Contact %1$s</string>
+    <string name="detail_connexion_pour_contacter">Sign in to contact the seller</string>
+    <string name="detail_admin_supprimer">Delete (administrator)</string>
+    <string name="detail_admin_supprimer_titre">Delete as administrator?</string>
+    <string name="detail_admin_supprimer_message">A reason is required: it is kept in the moderation log and can be shared with the seller.</string>
+    <string name="detail_admin_motif">Reason for deletion</string>
+    <string name="detail_erreur">Action failed.</string>
+
+    <!-- Post -->
+    <string name="post_titre">Post a listing</string>
+    <string name="post_sous_titre">A few details are enough: a clear title, a fair price, a category.</string>
+    <string name="post_action">Post the listing</string>
+    <string name="post_connexion_requise">Sign in to post a listing.</string>
+    <string name="post_erreur">Unable to post the listing.</string>
+
+    <!-- Edit -->
+    <string name="edit_titre">Edit the listing</string>
+    <string name="edit_action">Save</string>
+    <string name="edit_impossible_titre">Unable to edit</string>
+    <string name="edit_connexion_requise">Sign in to edit a listing.</string>
+    <string name="edit_pas_proprietaire">You are not the owner of this listing.</string>
+    <string name="edit_vendue">A sold listing can no longer be edited: repost it to put it back on sale.</string>
+    <string name="edit_erreur">Unable to save.</string>
+
+    <!-- My listings -->
+    <string name="mes_titre">My listings</string>
+    <string name="mes_bonjour">Hi %1$s, here are your sales.</string>
+    <string name="mes_bonjour_sans_nom">Hi, here are your sales.</string>
+    <string name="mes_stat_publiees">Posted</string>
+    <string name="mes_stat_en_ligne">Live</string>
+    <string name="mes_stat_reservees">Reserved</string>
+    <string name="mes_stat_vendues">Sold</string>
+    <string name="mes_filtre_toutes">All</string>
+    <string name="mes_filtre_en_ligne">Live</string>
+    <string name="mes_filtre_vendues">Sold</string>
+    <string name="mes_vide_toutes">No listing</string>
+    <string name="mes_vide_toutes_message">Post your first item: it takes two minutes to go live.</string>
+    <string name="mes_vide_en_ligne">Nothing live</string>
+    <string name="mes_vide_en_ligne_message">Mark a listing as sold from its page to find it here.</string>
+    <string name="mes_vide_vendues">No sale yet</string>
+    <string name="mes_vide_vendues_message">Your sold listings appear in the “Sold” tab.</string>
+    <string name="mes_erreur_titre">Oops</string>
+    <string name="mes_erreur">Unable to load your listings.</string>
+
+    <!-- Favourites -->
+    <string name="favoris_titre">Favourites</string>
+    <string name="favoris_sous_titre">The items you keep an eye on.</string>
+    <string name="favoris_vide_titre">No favourite yet</string>
+    <string name="favoris_vide_message">Tap the heart on a listing to find it here, even after it is sold.</string>
+    <string name="favoris_connexion_message">Sign in to save your favourites.</string>
+    <string name="favoris_erreur">Unable to load your favourites.</string>
+
+    <!-- Profile -->
+    <string name="profil_non_connecte_titre">Not signed in</string>
+    <string name="profil_non_connecte_message">Sign in with your ISEP account to post, reserve and track your sales.</string>
+    <string name="profil_se_connecter">Sign in</string>
+    <string name="profil_mon_activite">My activity</string>
+    <string name="profil_infos">Account details</string>
+    <string name="profil_nom">Name</string>
+    <string name="profil_email">Email</string>
+    <string name="profil_role">Role</string>
+    <string name="profil_membre_depuis">Member since</string>
+    <string name="profil_deconnexion">Sign out</string>
+    <string name="profil_moderation">Moderation log</string>
+    <string name="profil_moderation_vide">No administrative removal so far.</string>
+    <string name="profil_moderation_entree">%1$s — %2$s</string>
+
+    <!-- Sign in -->
+    <string name="login_titre">Welcome back 👋</string>
+    <string name="login_sous_titre">Sign in to post a listing, reserve an item and track your sales.</string>
+    <string name="login_email">ISEP email</string>
+    <string name="login_email_placeholder">first.last@etu.fr</string>
+    <string name="login_mot_de_passe">Password</string>
+    <string name="login_afficher">Show</string>
+    <string name="login_masquer">Hide</string>
+    <string name="login_action">Sign in</string>
+    <string name="login_comptes_demo">Demo accounts</string>
+    <string name="login_comptes_demo_aide">tap to fill</string>
+    <string name="login_erreur_champs">Enter your email and password.</string>
+    <string name="login_erreur_identifiants">Wrong email or password.</string>
+
+    <!-- Business errors -->
+    <string name="erreur_titre_vide">The title must not be empty.</string>
+    <string name="erreur_titre_trop_long">The title is too long (80 characters maximum).</string>
+    <string name="erreur_description_trop_longue">The description is too long (1000 characters maximum).</string>
+    <string name="erreur_prix_invalide">The price must be greater than 0 €.</string>
+    <string name="erreur_acheteur_obligatoire">Enter the buyer\'s name.</string>
+    <string name="erreur_motif_obligatoire">Enter the reason for the deletion.</string>
+    <string name="erreur_motif_trop_long">The reason is too long (200 characters maximum).</string>
+    <string name="erreur_transition_interdite">This state change is not allowed.</string>
+    <string name="erreur_annonce_introuvable">This listing no longer exists.</string>
+    <string name="erreur_non_proprietaire">Only the owner can perform this action.</string>
+    <string name="erreur_non_administrateur">This action is restricted to administrators.</string>
+
+</resources>

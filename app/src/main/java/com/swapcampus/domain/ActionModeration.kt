@@ -1,17 +1,24 @@
 package com.swapcampus.domain
 
-import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalDate
 
-sealed class CibleModeration
-data class CibleAnnonce(val annonce: Annonce) : CibleModeration()
-data class CibleCompte(val compte: CompteUtilisateur) : CibleModeration()
-
-
+/**
+ * Trace d'une action de modération (§5, UC6 et §3.2).
+ *
+ * Une suppression effectuée par un administrateur doit être motivée : le motif
+ * est conservé pour pouvoir répondre à un vendeur qui demande pourquoi son
+ * annonce a disparu.
+ *
+ * @param annonceId identifiant de l'annonce concernée.
+ * @param annonceTitre titre au moment de la suppression (l'annonce n'existe plus).
+ * @param moderateur administrateur auteur de l'action.
+ * @param motif raison saisie, obligatoire.
+ * @param date jour de l'action.
+ */
 data class ActionModeration(
-    val id: Int,
-    val cible: CibleModeration,
-    val type: TypeActionModeration,
+    val annonceId: Int,
+    val annonceTitre: String,
+    val moderateur: CompteUtilisateur,
     val motif: String,
-    val administrateur: CompteUtilisateur,
-    val date: LocalDateTime
+    val date: LocalDate
 )

@@ -25,23 +25,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swapcampus.R
+import com.swapcampus.domain.ActionModeration
 import com.swapcampus.domain.CompteUtilisateur
-import com.swapcampus.domain.libelle
 import com.swapcampus.ui.components.EmptyState
 import com.swapcampus.ui.components.SectionTitle
 import com.swapcampus.ui.components.StatCard
 import com.swapcampus.ui.components.formaterDate
 import com.swapcampus.ui.components.initiales
+import com.swapcampus.ui.text.libelle
 import com.swapcampus.ui.theme.Amber
 import com.swapcampus.ui.theme.Indigo
 import com.swapcampus.ui.theme.Teal
 
 /**
- * Profil : identité de l'utilisateur connecté et récapitulatif de son
- * activité de vendeur (UC7).
+ * Profil : identité de l'utilisateur connecté, récapitulatif de son activité
+ * de vendeur (UC7) et, pour un administrateur, journal de modération (§3.2).
  */
 @Composable
 fun ProfileScreen(
@@ -51,14 +54,16 @@ fun ProfileScreen(
 ) {
     val utilisateur by viewModel.currentUser.collectAsStateWithLifecycle()
     val statistiques by viewModel.statistiques.collectAsStateWithLifecycle()
+    val estAdmin by viewModel.estAdministrateur.collectAsStateWithLifecycle()
+    val moderations by viewModel.moderations.collectAsStateWithLifecycle()
 
     if (utilisateur == null) {
         Column(modifier = modifier.fillMaxSize().padding(top = 24.dp)) {
             EmptyState(
-                titre = "Pas encore connecté",
-                message = "Connectez-vous avec votre compte ISEP pour publier, réserver et suivre vos ventes.",
+                titre = stringResource(R.string.profil_non_connecte_titre),
+                message = stringResource(R.string.profil_non_connecte_message),
                 glyphe = "👤",
-                actionLabel = "Se connecter",
+                actionLabel = stringResource(R.string.profil_se_connecter),
                 onAction = onLoginClick
             )
         }
@@ -79,25 +84,25 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(20.dp))
 
-        SectionTitle(titre = "Mon activité")
+        SectionTitle(titre = stringResource(R.string.profil_mon_activite))
         Spacer(Modifier.height(10.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatCard(
                 valeur = statistiques.publiees,
-                libelle = "Publiées",
+                libelle = stringResource(R.string.mes_stat_publiees),
                 accent = Indigo,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 valeur = statistiques.enLigne,
-                libelle = "En ligne",
+                libelle = stringResource(R.string.mes_stat_en_ligne),
                 accent = Teal,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 valeur = statistiques.vendues,
-                libelle = "Vendues",
+                libelle = stringResource(R.string.mes_stat_vendues),
                 accent = Amber,
                 modifier = Modifier.weight(1f)
             )
@@ -105,7 +110,7 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(24.dp))
 
-        SectionTitle(titre = "Informations du compte")
+        SectionTitle(titre = stringResource(R.string.profil_infos))
         Spacer(Modifier.height(10.dp))
 
         Surface(
@@ -117,15 +122,25 @@ fun ProfileScreen(
             )
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                LigneInfo(libelle = "Nom", valeur = compte.nom)
-                LigneInfo(libelle = "Email", valeur = compte.email)
-                LigneInfo(libelle = "Rôle", valeur = compte.role.libelle())
+                LigneInfo(libelle = stringResource(R.string.profil_nom), valeur = compte.nom)
+                LigneInfo(libelle = stringResource(R.string.profil_email), valeur = compte.email)
                 LigneInfo(
-                    libelle = "Membre depuis",
+                    libelle = stringResource(R.string.profil_role),
+                    valeur = compte.role.libelle()
+                )
+                LigneInfo(
+                    libelle = stringResource(R.string.profil_membre_depuis),
                     valeur = formaterDate(compte.dateCreation),
                     derniere = true
                 )
             }
+        }
+
+        if (estAdmin) {
+            Spacer(Modifier.height(24.dp))
+            SectionTitle(titre = stringResource(R.string.profil_moderation))
+            Spacer(Modifier.height(10.dp))
+            JournalModeration(moderations)
         }
 
         Spacer(Modifier.height(28.dp))
@@ -139,7 +154,7 @@ fun ProfileScreen(
             shape = MaterialTheme.shapes.medium
         ) {
             Text(
-                text = "Se déconnecter",
+                text = stringResource(R.string.profil_deconnexion),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.error
             )
@@ -149,16 +164,62 @@ fun ProfileScreen(
     }
 }
 
+/** Journal des suppressions motivées, visible par les administrateurs. */
+@Composable
+private fun JournalModeration(moderations: List<ActionModeration>, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier.fillMaxWidth().testTag("liste_moderation"),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant
+        )
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            if (moderations.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.profil_moderation_vide),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                moderations.forEachIndexed { index, action ->
+                    if (index > 0) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            modifier = Modifier.padding(vertical = 10.dp)
+                        )
+                    }
+                    Text(
+                        text = stringResource(
+                            R.string.profil_moderation_entree,
+                            action.annonceTitre,
+                            action.motif
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.testTag("moderation_${action.annonceId}")
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = formaterDate(action.date) + " · " + action.moderateur.nom,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun BlocIdentite(compte: CompteUtilisateur, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier
                 .size(72.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = CircleShape
-                ),
+                .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(

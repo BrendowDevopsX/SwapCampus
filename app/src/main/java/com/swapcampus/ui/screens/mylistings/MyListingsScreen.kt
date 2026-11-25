@@ -22,21 +22,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swapcampus.R
 import com.swapcampus.domain.StatistiquesVendeur
 import com.swapcampus.ui.components.EmptyState
 import com.swapcampus.ui.components.ListingCard
 import com.swapcampus.ui.components.LoadingIndicator
 import com.swapcampus.ui.components.PuceFiltre
 import com.swapcampus.ui.components.StatCard
+import com.swapcampus.ui.text.messageErreur
 import com.swapcampus.ui.theme.Amber
 import com.swapcampus.ui.theme.Indigo
 import com.swapcampus.ui.theme.InkSoft
 import com.swapcampus.ui.theme.Teal
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 
 /**
  * Espace vendeur (UC7) : compteurs de son activité, filtre par état et liste
@@ -54,6 +57,7 @@ fun MyListingsScreen(
     val utilisateur by viewModel.utilisateurCourant.collectAsStateWithLifecycle()
 
     Column(modifier = modifier.fillMaxSize()) {
+        val prenom = utilisateur?.nom?.substringBefore(' ')
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,14 +66,17 @@ fun MyListingsScreen(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Mes annonces",
+                    text = stringResource(R.string.mes_titre),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = "Bonjour " + (utilisateur?.nom?.substringBefore(' ') ?: "à vous") +
-                        ", voici vos ventes.",
+                    text = if (prenom.isNullOrBlank()) {
+                        stringResource(R.string.mes_bonjour_sans_nom)
+                    } else {
+                        stringResource(R.string.mes_bonjour, prenom)
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -93,13 +100,11 @@ fun MyListingsScreen(
         when (val etat = uiState) {
             MyListingsViewModel.MesAnnoncesUiState.Chargement -> LoadingIndicator()
 
-            is MyListingsViewModel.MesAnnoncesUiState.Erreur -> {
-                EmptyState(
-                    titre = "Oups",
-                    message = etat.message,
-                    glyphe = "⚠️"
-                )
-            }
+            is MyListingsViewModel.MesAnnoncesUiState.Erreur -> EmptyState(
+                titre = stringResource(R.string.mes_erreur_titre),
+                message = messageErreur(etat.cause, R.string.mes_erreur),
+                glyphe = "⚠️"
+            )
 
             is MyListingsViewModel.MesAnnoncesUiState.Pret -> {
                 TableauBord(statistiques = etat.statistiques)
@@ -112,7 +117,7 @@ fun MyListingsScreen(
                 ) {
                     FiltreMesAnnonces.entries.forEach { option ->
                         PuceFiltre(
-                            libelle = option.libelle,
+                            libelle = stringResource(option.libelle),
                             selectionne = filtre == option,
                             onClick = { viewModel.onFiltreChange(option) },
                             testTag = "filtre_mes_${option.name}",
@@ -131,23 +136,22 @@ fun MyListingsScreen(
                     if (etat.annonces.isEmpty()) {
                         item(key = "vide") {
                             EmptyState(
-                                titre = when (filtre) {
-                                    FiltreMesAnnonces.TOUTES -> "Aucune annonce"
-                                    FiltreMesAnnonces.EN_LIGNE -> "Rien en ligne"
-                                    FiltreMesAnnonces.VENDUES -> "Aucune vente"
-                                },
-                                message = when (filtre) {
-                                    FiltreMesAnnonces.TOUTES ->
-                                        "Publiez votre premier objet : en deux minutes, c'est en ligne."
-
-                                    FiltreMesAnnonces.EN_LIGNE ->
-                                        "Vos annonces vendues apparaissent dans l'onglet « Vendues »."
-
-                                    FiltreMesAnnonces.VENDUES ->
-                                        "Marquez une annonce comme vendue depuis sa fiche pour la retrouver ici."
-                                },
+                                titre = stringResource(
+                                    when (filtre) {
+                                        FiltreMesAnnonces.TOUTES -> R.string.mes_vide_toutes
+                                        FiltreMesAnnonces.EN_LIGNE -> R.string.mes_vide_en_ligne
+                                        FiltreMesAnnonces.VENDUES -> R.string.mes_vide_vendues
+                                    }
+                                ),
+                                message = stringResource(
+                                    when (filtre) {
+                                        FiltreMesAnnonces.TOUTES -> R.string.mes_vide_toutes_message
+                                        FiltreMesAnnonces.EN_LIGNE -> R.string.mes_vide_en_ligne_message
+                                        FiltreMesAnnonces.VENDUES -> R.string.mes_vide_vendues_message
+                                    }
+                                ),
                                 glyphe = "📦",
-                                actionLabel = "Publier une annonce",
+                                actionLabel = stringResource(R.string.post_titre),
                                 onAction = onPostClick
                             )
                         }
@@ -168,17 +172,20 @@ fun MyListingsScreen(
 /** Les quatre compteurs du tableau de bord vendeur (UC7). */
 @Composable
 private fun TableauBord(statistiques: StatistiquesVendeur, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(horizontal = 20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(
+        modifier = modifier.padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatCard(
                 valeur = statistiques.publiees,
-                libelle = "Publiées",
+                libelle = stringResource(R.string.mes_stat_publiees),
                 accent = Indigo,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 valeur = statistiques.enLigne,
-                libelle = "En ligne",
+                libelle = stringResource(R.string.mes_stat_en_ligne),
                 accent = Teal,
                 modifier = Modifier.weight(1f)
             )
@@ -186,13 +193,13 @@ private fun TableauBord(statistiques: StatistiquesVendeur, modifier: Modifier = 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatCard(
                 valeur = statistiques.reservees,
-                libelle = "Réservées",
+                libelle = stringResource(R.string.mes_stat_reservees),
                 accent = Amber,
                 modifier = Modifier.weight(1f)
             )
             StatCard(
                 valeur = statistiques.vendues,
-                libelle = "Vendues",
+                libelle = stringResource(R.string.mes_stat_vendues),
                 accent = InkSoft,
                 modifier = Modifier.weight(1f)
             )

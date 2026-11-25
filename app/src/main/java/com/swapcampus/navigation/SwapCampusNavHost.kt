@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import com.swapcampus.di.AppContainer
 import com.swapcampus.ui.screens.detail.ListingDetailScreen
 import com.swapcampus.ui.screens.edit.EditListingScreen
+import com.swapcampus.ui.screens.favoris.FavorisScreen
 import com.swapcampus.ui.screens.listings.ListingsScreen
 import com.swapcampus.ui.screens.login.LoginScreen
 import com.swapcampus.ui.screens.mylistings.MyListingsScreen
@@ -58,6 +59,13 @@ fun SwapCampusNavHost(
             }
         }
 
+        composable(Routes.FAVORIS) {
+            FavorisScreen(
+                onListingClick = { id -> navController.navigate(Routes.detail(id)) },
+                onLoginClick = { navController.navigate(Routes.LOGIN) }
+            )
+        }
+
         composable(Routes.PROFILE) {
             ProfileScreen(
                 onLoginClick = { navController.navigate(Routes.LOGIN) }
@@ -95,7 +103,8 @@ fun SwapCampusNavHost(
                 onEdit = { navController.navigate(Routes.edit(listingId)) },
                 onDeleted = { navController.popBackStack() },
                 onBack = { navController.popBackStack() },
-                onLogin = { navController.navigate(Routes.LOGIN) }
+                onLogin = { navController.navigate(Routes.LOGIN) },
+                onRepublie = { nouvelId -> navController.navigate(Routes.detail(nouvelId)) }
             )
         }
 

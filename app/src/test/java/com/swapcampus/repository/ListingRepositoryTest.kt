@@ -112,7 +112,8 @@ class ListingRepositoryTest {
         )
 
         assertTrue(resultat.isFailure)
-        assertEquals("Le titre ne doit pas être vide.", resultat.exceptionOrNull()?.message)
+        val erreur = assertIs<com.swapcampus.domain.ErreurMetierException>(resultat.exceptionOrNull())
+        assertEquals(com.swapcampus.domain.ErreurMetier.TITRE_VIDE, erreur.erreur)
     }
 
     @Test
@@ -128,7 +129,9 @@ class ListingRepositoryTest {
                 auteur = EchantillonDonnees.alice
             )
             assertTrue(resultat.isFailure, "Le prix $prix doit être refusé")
-            assertEquals("Le prix doit être supérieur à 0 €.", resultat.exceptionOrNull()?.message)
+            val erreur =
+                assertIs<com.swapcampus.domain.ErreurMetierException>(resultat.exceptionOrNull())
+            assertEquals(com.swapcampus.domain.ErreurMetier.PRIX_INVALIDE, erreur.erreur)
         }
         assertTrue(depot.allListings().first().isEmpty())
     }

@@ -23,11 +23,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swapcampus.R
 import com.swapcampus.domain.Categorie
 import com.swapcampus.ui.components.ListingFormFields
+import com.swapcampus.ui.text.messageErreur
 
 /**
  * Création d'annonce (UC1). Le formulaire est validé côté domaine ; ici on
@@ -40,7 +43,7 @@ fun PostListingScreen(
     modifier: Modifier = Modifier,
     viewModel: PostListingViewModel = viewModel()
 ) {
-    val erreur by viewModel.error.collectAsStateWithLifecycle()
+    val erreur by viewModel.erreur.collectAsStateWithLifecycle()
     val enregistrement by viewModel.enregistrement.collectAsStateWithLifecycle()
 
     var titre by remember { mutableStateOf("") }
@@ -69,7 +72,7 @@ fun PostListingScreen(
             }
             Spacer(Modifier.size(4.dp))
             Text(
-                text = "Publier une annonce",
+                text = stringResource(R.string.post_titre),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -77,7 +80,7 @@ fun PostListingScreen(
 
         Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)) {
             Text(
-                text = "Quelques détails suffisent : un titre clair, un prix juste, une catégorie.",
+                text = stringResource(R.string.post_sous_titre),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -95,14 +98,22 @@ fun PostListingScreen(
                 onCategorieChange = { categorie = it },
                 photoUrl = photoUrl,
                 onPhotoUrlChange = { photoUrl = it },
-                erreurTitre = if (titreInvalide) "Le titre est obligatoire." else null,
-                erreurPrix = if (prixInvalide) "Le prix doit être supérieur à 0 €." else null
+                erreurTitre = if (titreInvalide) {
+                    stringResource(R.string.erreur_titre_vide)
+                } else {
+                    null
+                },
+                erreurPrix = if (prixInvalide) {
+                    stringResource(R.string.erreur_prix_invalide)
+                } else {
+                    null
+                }
             )
 
             if (erreur != null) {
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text = erreur.orEmpty(),
+                    text = messageErreur(erreur, R.string.post_erreur),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error
                 )
@@ -140,7 +151,10 @@ fun PostListingScreen(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
-                    Text("Publier l'annonce", style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        text = stringResource(R.string.post_action),
+                        style = MaterialTheme.typography.labelLarge
+                    )
                 }
             }
 

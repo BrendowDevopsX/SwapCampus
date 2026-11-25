@@ -1,7 +1,9 @@
 package com.swapcampus.ui.screens.login
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.swapcampus.R
 import com.swapcampus.di.AppContainer
 import com.swapcampus.domain.CompteUtilisateur
 import com.swapcampus.repository.AuthRepository
@@ -27,31 +29,33 @@ class LoginViewModel(
     private val _motDePasse = MutableStateFlow("")
     val motDePasse: StateFlow<String> = _motDePasse.asStateFlow()
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error.asStateFlow()
+    /** Message d'erreur, porté par sa ressource pour rester traduisible. */
+    private val _erreur: MutableStateFlow<Int?> = MutableStateFlow(null)
+    @get:StringRes
+    val erreur: StateFlow<Int?> = _erreur.asStateFlow()
 
     private val _chargement = MutableStateFlow(false)
     val chargement: StateFlow<Boolean> = _chargement.asStateFlow()
 
     fun onEmailChange(valeur: String) {
         _email.value = valeur
-        _error.value = null
+        _erreur.value = null
     }
 
     fun onMotDePasseChange(valeur: String) {
         _motDePasse.value = valeur
-        _error.value = null
+        _erreur.value = null
     }
 
     /** Pré-remplit le formulaire avec un compte de démonstration. */
     fun remplirAvec(compte: CompteUtilisateur) {
         _email.value = compte.email
         _motDePasse.value = compte.motDePasseHash
-        _error.value = null
+        _erreur.value = null
     }
 
     fun clearError() {
-        _error.value = null
+        _erreur.value = null
     }
 
     fun login(onSuccess: () -> Unit) {
@@ -59,7 +63,7 @@ class LoginViewModel(
         val motDePasse = _motDePasse.value
 
         if (email.isEmpty() || motDePasse.isEmpty()) {
-            _error.value = "Renseignez votre email et votre mot de passe."
+            _erreur.value = R.string.login_erreur_champs
             return
         }
 
@@ -68,7 +72,7 @@ class LoginViewModel(
             val compte = authRepository.authenticate(email, motDePasse)
             _chargement.value = false
             if (compte == null) {
-                _error.value = "Email ou mot de passe incorrect."
+                _erreur.value = R.string.login_erreur_identifiants
             } else {
                 onSuccess()
             }

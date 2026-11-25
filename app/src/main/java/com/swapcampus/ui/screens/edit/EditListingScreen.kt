@@ -23,13 +23,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swapcampus.R
 import com.swapcampus.domain.Categorie
 import com.swapcampus.ui.components.EmptyState
 import com.swapcampus.ui.components.ListingFormFields
 import com.swapcampus.ui.components.LoadingIndicator
+import com.swapcampus.ui.text.messageErreur
 
 /**
  * Modification d'annonce (UC4), réservée au propriétaire. Les champs sont
@@ -52,6 +55,7 @@ fun EditListingScreen(
     var categorie by remember { mutableStateOf<Categorie?>(null) }
     var photoUrl by remember { mutableStateOf("") }
     var preRempli by remember { mutableStateOf(false) }
+    var tentativeEnvoi by remember { mutableStateOf(false) }
 
     LaunchedEffect(listingId) { viewModel.load(listingId) }
 
@@ -59,10 +63,10 @@ fun EditListingScreen(
         EditUiState.Loading -> LoadingIndicator()
 
         is EditUiState.Error -> EmptyState(
-            titre = "Modification impossible",
-            message = etat.message,
+            titre = stringResource(R.string.edit_impossible_titre),
+            message = stringResource(etat.message),
             glyphe = "🔒",
-            actionLabel = "Retour",
+            actionLabel = stringResource(R.string.action_retour),
             onAction = onBack
         )
 
@@ -77,6 +81,10 @@ fun EditListingScreen(
                     preRempli = true
                 }
             }
+
+            val titreInvalide = tentativeEnvoi && titre.isBlank()
+            val prixInvalide = tentativeEnvoi &&
+                (prix.replace(',', '.').toDoubleOrNull() ?: 0.0) <= 0.0
 
             Column(
                 modifier = modifier
@@ -94,7 +102,7 @@ fun EditListingScreen(
                     }
                     Spacer(Modifier.size(4.dp))
                     Text(
-                        text = "Modifier l'annonce",
+                        text = stringResource(R.string.edit_titre),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -111,13 +119,23 @@ fun EditListingScreen(
                         categorie = categorie,
                         onCategorieChange = { categorie = it },
                         photoUrl = photoUrl,
-                        onPhotoUrlChange = { photoUrl = it }
+                        onPhotoUrlChange = { photoUrl = it },
+                        erreurTitre = if (titreInvalide) {
+                            stringResource(R.string.erreur_titre_vide)
+                        } else {
+                            null
+                        },
+                        erreurPrix = if (prixInvalide) {
+                            stringResource(R.string.erreur_prix_invalide)
+                        } else {
+                            null
+                        }
                     )
 
                     if (erreur != null) {
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = erreur.orEmpty(),
+                            text = messageErreur(erreur, R.string.edit_erreur),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error
                         )
@@ -127,9 +145,10 @@ fun EditListingScreen(
 
                     Button(
                         onClick = {
+                            tentativeEnvoi = true
                             val prixSaisi = prix.replace(',', '.').toDoubleOrNull() ?: 0.0
                             val categorieChoisie = categorie
-                            if (categorieChoisie != null) {
+                            if (titre.isNotBlank() && prixSaisi > 0.0 && categorieChoisie != null) {
                                 viewModel.update(
                                     titre = titre,
                                     description = description,
@@ -146,7 +165,10 @@ fun EditListingScreen(
                             .testTag("bouton_enregistrer_annonce"),
                         shape = MaterialTheme.shapes.medium
                     ) {
-                        Text("Enregistrer", style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            text = stringResource(R.string.edit_action),
+                            style = MaterialTheme.typography.labelLarge
+                        )
                     }
 
                     Spacer(Modifier.height(32.dp))

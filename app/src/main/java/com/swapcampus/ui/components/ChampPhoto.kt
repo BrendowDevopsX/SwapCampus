@@ -26,13 +26,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import com.swapcampus.R
 import com.swapcampus.domain.Categorie
 import com.swapcampus.ui.theme.style
 import kotlinx.coroutines.Dispatchers
@@ -107,14 +109,14 @@ fun ChampPhoto(
                     },
                     modifier = Modifier.testTag("bouton_galerie")
                 ) {
-                    Text("Choisir une photo")
+                    Text(stringResource(R.string.photo_choisir))
                 }
                 if (photoUrl.isNotBlank()) {
                     TextButton(
                         onClick = { onPhotoUrlChange("") },
                         modifier = Modifier.testTag("bouton_retirer_photo")
                     ) {
-                        Text("Retirer")
+                        Text(stringResource(R.string.photo_retirer))
                     }
                 }
             }
@@ -126,14 +128,14 @@ fun ChampPhoto(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("champ_photo"),
-            label = { Text("Photo (facultatif)") },
-            placeholder = { Text("Lien d'une image ou photo choisie") },
+            label = { Text(stringResource(R.string.champ_photo)) },
+            placeholder = { Text(stringResource(R.string.champ_photo_placeholder)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Uri,
                 imeAction = ImeAction.Done
             ),
-            supportingText = { Text("Choisissez une photo de votre galerie ou collez un lien.") },
+            supportingText = { Text(stringResource(R.string.champ_photo_aide)) },
             shape = MaterialTheme.shapes.medium
         )
     }

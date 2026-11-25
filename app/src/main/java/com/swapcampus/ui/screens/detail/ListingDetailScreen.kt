@@ -34,16 +34,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swapcampus.R
 import com.swapcampus.domain.Annonce
 import com.swapcampus.domain.Disponible
 import com.swapcampus.domain.Reservee
+import com.swapcampus.domain.RoleUtilisateur
 import com.swapcampus.domain.Vendue
-import com.swapcampus.domain.libelle
 import com.swapcampus.ui.components.ConfirmDialog
 import com.swapcampus.ui.components.EmptyState
 import com.swapcampus.ui.components.ListingThumbnail
@@ -53,6 +57,8 @@ import com.swapcampus.ui.components.StatusBadge
 import com.swapcampus.ui.components.formaterDate
 import com.swapcampus.ui.components.formaterPrix
 import com.swapcampus.ui.components.initiales
+import com.swapcampus.ui.text.libelle
+import com.swapcampus.ui.text.messageErreur
 import com.swapcampus.ui.theme.DisponibleFond
 import com.swapcampus.ui.theme.DisponibleTexte
 import com.swapcampus.ui.theme.ReserveeFond
@@ -65,8 +71,9 @@ import com.swapcampus.ui.theme.style
  * Fiche détaillée d'une annonce (UC4, UC5, UC6).
  *
  * Le propriétaire dispose des actions de gestion ; un visiteur connecté peut
- * contacter le vendeur. Les vérifications de propriété et de transition sont
- * faites dans le ViewModel / le domaine, pas ici.
+ * contacter le vendeur ; un administrateur peut retirer l'annonce avec un
+ * motif obligatoire (§3.2). Les vérifications de propriété, de rôle et de
+ * transition sont faites dans le ViewModel / le domaine, pas ici.
  */
 @Composable
 fun ListingDetailScreen(
@@ -75,6 +82,7 @@ fun ListingDetailScreen(
     onDeleted: () -> Unit,
     onBack: () -> Unit,
     onLogin: () -> Unit = {},
+    onRepublie: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: ListingDetailViewModel = viewModel(key = "detail_$listingId")
 ) {
@@ -83,9 +91,11 @@ fun ListingDetailScreen(
     val erreurAction by viewModel.actionError.collectAsStateWithLifecycle()
 
     var afficherSuppression by remember { mutableStateOf(false) }
+    var afficherModeration by remember { mutableStateOf(false) }
     var afficherReservation by remember { mutableStateOf(false) }
     var afficherContact by remember { mutableStateOf(false) }
     var acheteur by remember { mutableStateOf("") }
+    var motif by remember { mutableStateOf("") }
 
     LaunchedEffect(listingId) { viewModel.load(listingId) }
 
@@ -93,16 +103,17 @@ fun ListingDetailScreen(
         DetailUiState.Loading -> LoadingIndicator()
 
         is DetailUiState.Error -> EmptyState(
-            titre = "Annonce introuvable",
-            message = etat.message,
+            titre = stringResource(R.string.detail_introuvable_titre),
+            message = stringResource(R.string.detail_introuvable_message),
             glyphe = "🔍",
-            actionLabel = "Retour au catalogue",
+            actionLabel = stringResource(R.string.detail_retour_catalogue),
             onAction = onBack
         )
 
         is DetailUiState.Ready -> {
             val annonce = etat.annonce
             val estProprietaire = utilisateur?.id == annonce.auteur.id
+            val estAdmin = utilisateur?.role == RoleUtilisateur.ADMINISTRATEUR
 
             Column(modifier = modifier.fillMaxSize()) {
                 Column(
@@ -145,13 +156,26 @@ fun ListingDetailScreen(
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         Spacer(Modifier.height(20.dp))
 
-                        SectionTitle(titre = "Description")
+                        SectionTitle(titre = stringResource(R.string.detail_description))
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = annonce.description.ifBlank { "Aucune description fournie." },
+                            text = annonce.description
+                                .ifBlank { stringResource(R.string.detail_sans_description) },
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+
+                        if (estAdmin && !estProprietaire) {
+                            Spacer(Modifier.height(24.dp))
+                            OutlinedButton(
+                                onClick = { afficherModeration = true },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("bouton_moderer")
+                            ) {
+                                Text(stringResource(R.string.detail_admin_supprimer))
+                            }
+                        }
 
                         Spacer(Modifier.height(28.dp))
                     }
@@ -159,7 +183,7 @@ fun ListingDetailScreen(
 
                 if (erreurAction != null) {
                     Text(
-                        text = erreurAction.orEmpty(),
+                        text = messageErreur(erreurAction, R.string.detail_erreur),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
@@ -174,6 +198,7 @@ fun ListingDetailScreen(
                     onMarquerVendue = { viewModel.marquerVendue(annonce.id) },
                     onAnnulerReservation = { viewModel.annulerReservation(annonce.id) },
                     onRemettreEnVente = { viewModel.annulerReservation(annonce.id) },
+                    onRepublier = { viewModel.republier(annonce.id, onRepublie) },
                     onModifier = onEdit,
                     onContacter = {
                         if (utilisateur == null) onLogin() else afficherContact = true
@@ -183,10 +208,11 @@ fun ListingDetailScreen(
 
             if (afficherSuppression) {
                 ConfirmDialog(
-                    title = "Supprimer l'annonce ?",
-                    message = "« " + annonce.titre + " » sera définitivement retirée du catalogue.",
-                    confirmLabel = "Supprimer",
-                    dismissLabel = "Annuler",
+                    title = stringResource(R.string.detail_supprimer_titre),
+                    message = stringResource(R.string.detail_supprimer_message, annonce.titre),
+                    confirmLabel = stringResource(R.string.action_supprimer),
+                    dismissLabel = stringResource(R.string.action_annuler),
+                    testTag = "dialogue_suppression",
                     onConfirm = {
                         afficherSuppression = false
                         viewModel.supprimer(annonce.id, onDeleted)
@@ -195,23 +221,68 @@ fun ListingDetailScreen(
                 )
             }
 
-            if (afficherReservation) {
+            if (afficherModeration) {
                 AlertDialog(
-                    onDismissRequest = { afficherReservation = false },
-                    title = { Text("Réserver l'annonce") },
+                    onDismissRequest = { afficherModeration = false },
+                    title = { Text(stringResource(R.string.detail_admin_supprimer_titre)) },
                     text = {
                         Column {
                             Text(
-                                "Indiquez le nom de l'acheteur : l'annonce passera en « Réservée » " +
-                                    "et ne sera plus visible dans le catalogue.",
+                                text = stringResource(R.string.detail_admin_supprimer_message),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Spacer(Modifier.height(12.dp))
+                            OutlinedTextField(
+                                value = motif,
+                                onValueChange = { motif = it },
+                                label = { Text(stringResource(R.string.detail_admin_motif)) },
+                                singleLine = false,
+                                minLines = 2,
+                                shape = MaterialTheme.shapes.medium,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .testTag("champ_motif")
+                            )
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.supprimerEnAdministrateur(
+                                    listingId = annonce.id,
+                                    motif = motif,
+                                    onDeleted = onDeleted
+                                )
+                                afficherModeration = false
+                            },
+                            modifier = Modifier.testTag("bouton_confirmer_moderation")
+                        ) { Text(stringResource(R.string.action_supprimer)) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { afficherModeration = false }) {
+                            Text(stringResource(R.string.action_annuler))
+                        }
+                    }
+                )
+            }
+
+            if (afficherReservation) {
+                AlertDialog(
+                    onDismissRequest = { afficherReservation = false },
+                    title = { Text(stringResource(R.string.detail_reserver_titre)) },
+                    text = {
+                        Column {
+                            Text(
+                                text = stringResource(R.string.detail_reserver_message),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Spacer(Modifier.height(12.dp))
                             OutlinedTextField(
                                 value = acheteur,
                                 onValueChange = { acheteur = it },
-                                label = { Text("Nom de l'acheteur") },
+                                label = { Text(stringResource(R.string.detail_reserver_champ)) },
                                 singleLine = true,
+                                shape = MaterialTheme.shapes.medium,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .testTag("champ_acheteur")
@@ -223,11 +294,14 @@ fun ListingDetailScreen(
                             onClick = {
                                 viewModel.reserver(annonce.id, acheteur)
                                 afficherReservation = false
-                            }
-                        ) { Text("Réserver") }
+                            },
+                            modifier = Modifier.testTag("bouton_confirmer_reservation")
+                        ) { Text(stringResource(R.string.detail_reserver_action)) }
                     },
                     dismissButton = {
-                        TextButton(onClick = { afficherReservation = false }) { Text("Annuler") }
+                        TextButton(onClick = { afficherReservation = false }) {
+                            Text(stringResource(R.string.action_annuler))
+                        }
                     }
                 )
             }
@@ -235,11 +309,14 @@ fun ListingDetailScreen(
             if (afficherContact) {
                 AlertDialog(
                     onDismissRequest = { afficherContact = false },
-                    title = { Text("Contacter le vendeur") },
+                    title = { Text(stringResource(R.string.detail_contacter_titre)) },
                     text = {
                         Column {
                             Text(
-                                annonce.auteur.nom + " est joignable à l'adresse suivante :",
+                                text = stringResource(
+                                    R.string.detail_contacter_message,
+                                    annonce.auteur.nom
+                                ),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                             Spacer(Modifier.height(8.dp))
@@ -251,7 +328,9 @@ fun ListingDetailScreen(
                         }
                     },
                     confirmButton = {
-                        TextButton(onClick = { afficherContact = false }) { Text("Fermer") }
+                        TextButton(onClick = { afficherContact = false }) {
+                            Text(stringResource(R.string.action_fermer))
+                        }
                     }
                 )
             }
@@ -288,16 +367,19 @@ private fun Entete(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RondAction(onClick = onBack, etiquette = "Retour") {
+            RondAction(onClick = onBack, etiquette = stringResource(R.string.action_retour)) {
                 GlypheAction("←")
             }
             Spacer(Modifier.weight(1f))
             if (estProprietaire) {
-                RondAction(onClick = onEdit, etiquette = "Modifier") {
+                RondAction(onClick = onEdit, etiquette = stringResource(R.string.action_modifier)) {
                     GlypheAction("✎")
                 }
                 Spacer(Modifier.size(8.dp))
-                RondAction(onClick = onSupprimer, etiquette = "Supprimer") {
+                RondAction(
+                    onClick = onSupprimer,
+                    etiquette = stringResource(R.string.action_supprimer)
+                ) {
                     GlypheAction("🗑")
                 }
                 Spacer(Modifier.size(8.dp))
@@ -333,7 +415,7 @@ private fun RondAction(
 
 /** Glyphe texte utilisé à la place d'une icône (aucune dépendance d'icônes dans le projet). */
 @Composable
-private fun GlypheAction(glyphe: String, taille: androidx.compose.ui.unit.TextUnit = 16.sp) {
+private fun GlypheAction(glyphe: String, taille: TextUnit = 16.sp) {
     Text(
         text = glyphe,
         fontSize = taille,
@@ -367,27 +449,27 @@ private fun PuceCategorieDetail(annonce: Annonce, modifier: Modifier = Modifier)
 @Composable
 private fun BandeauEtat(annonce: Annonce, modifier: Modifier = Modifier) {
     val etat = annonce.etat
-    val fond: androidx.compose.ui.graphics.Color
-    val texte: androidx.compose.ui.graphics.Color
+    val fond: Color
+    val texte: Color
     val message: String
 
     when (etat) {
         is Reservee -> {
             fond = ReserveeFond
             texte = ReserveeTexte
-            message = "Réservée pour " + etat.acheteur
+            message = stringResource(R.string.etat_reservee_par, etat.acheteur)
         }
 
         is Vendue -> {
             fond = VendueFond
             texte = VendueTexte
-            message = "Vendue le " + formaterDate(etat.dateVente)
+            message = stringResource(R.string.etat_vendue_le, formaterDate(etat.dateVente))
         }
 
         is Disponible -> {
             fond = DisponibleFond
             texte = DisponibleTexte
-            message = "Disponible"
+            message = stringResource(R.string.etat_disponible)
         }
     }
 
@@ -433,7 +515,10 @@ private fun BlocVendeur(annonce: Annonce, modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Publiée le " + formaterDate(annonce.dateCreation),
+                text = stringResource(
+                    R.string.detail_publiee_le,
+                    formaterDate(annonce.dateCreation)
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -456,6 +541,7 @@ private fun BarreActions(
     onMarquerVendue: () -> Unit,
     onAnnulerReservation: () -> Unit,
     onRemettreEnVente: () -> Unit,
+    onRepublier: () -> Unit,
     onModifier: () -> Unit,
     onContacter: () -> Unit,
     modifier: Modifier = Modifier
@@ -476,7 +562,7 @@ private fun BarreActions(
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("bouton_reserver")
-                    ) { Text("Réserver à un acheteur") }
+                    ) { Text(stringResource(R.string.detail_reserver_vendeur)) }
 
                     is Reservee -> {
                         Button(
@@ -484,25 +570,31 @@ private fun BarreActions(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .testTag("bouton_vendre")
-                        ) { Text("Marquer comme vendue") }
+                        ) { Text(stringResource(R.string.detail_vendre)) }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(
                                 onClick = onAnnulerReservation,
                                 modifier = Modifier.weight(1f)
-                            ) { Text("Annuler la réservation") }
+                            ) { Text(stringResource(R.string.detail_annuler_reservation)) }
                             OutlinedButton(
                                 onClick = onModifier,
                                 modifier = Modifier.weight(1f)
-                            ) { Text("Modifier") }
+                            ) { Text(stringResource(R.string.action_modifier)) }
                         }
                     }
 
-                    is Vendue -> Button(
-                        onClick = onRemettreEnVente,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .testTag("bouton_remettre")
-                    ) { Text("Remettre en vente") }
+                    is Vendue -> {
+                        Button(
+                            onClick = onRepublier,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("bouton_republier")
+                        ) { Text(stringResource(R.string.detail_republier)) }
+                        OutlinedButton(
+                            onClick = onRemettreEnVente,
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text(stringResource(R.string.detail_remettre_en_vente)) }
+                    }
                 }
             } else {
                 Button(
@@ -514,9 +606,9 @@ private fun BarreActions(
                 ) {
                     Text(
                         if (connecte) {
-                            "Contacter " + annonce.auteur.nom
+                            stringResource(R.string.detail_contacter, annonce.auteur.nom)
                         } else {
-                            "Se connecter pour contacter le vendeur"
+                            stringResource(R.string.detail_connexion_pour_contacter)
                         }
                     )
                 }

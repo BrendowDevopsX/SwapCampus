@@ -12,11 +12,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.swapcampus.R
 import com.swapcampus.domain.Categorie
-import com.swapcampus.domain.libelle
+import com.swapcampus.ui.text.libelle
 import com.swapcampus.ui.theme.style
 
 /**
@@ -49,8 +51,8 @@ fun ListingFormFields(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("champ_titre"),
-            label = { Text("Titre") },
-            placeholder = { Text("Ex. Manuel de Kotlin, 2e édition") },
+            label = { Text(stringResource(R.string.champ_titre)) },
+            placeholder = { Text(stringResource(R.string.champ_titre_placeholder)) },
             singleLine = true,
             isError = erreurTitre != null,
             supportingText = erreurTitre?.let { { Text(it) } },
@@ -63,8 +65,8 @@ fun ListingFormFields(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("champ_description"),
-            label = { Text("Description") },
-            placeholder = { Text("État, édition, raison de la vente…") },
+            label = { Text(stringResource(R.string.champ_description)) },
+            placeholder = { Text(stringResource(R.string.champ_description_placeholder)) },
             minLines = 3,
             maxLines = 6,
             shape = MaterialTheme.shapes.medium
@@ -78,7 +80,7 @@ fun ListingFormFields(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("champ_prix"),
-            label = { Text("Prix (€)") },
+            label = { Text(stringResource(R.string.champ_prix)) },
             placeholder = { Text("0,00") },
             singleLine = true,
             isError = erreurPrix != null,
@@ -91,7 +93,7 @@ fun ListingFormFields(
         )
 
         Text(
-            text = "Catégorie",
+            text = stringResource(R.string.champ_categorie),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

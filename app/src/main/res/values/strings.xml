@@ -1,3 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Chaînes par défaut (français) — cahier des charges §8.7 et §10.2 :
+    aucun texte visible ne doit être écrit en dur dans le code Compose.
+    La version anglaise est dans values-en/strings.xml.
+-->
 <resources>
+
     <string name="app_name">SwapCampus</string>
+
+    <!-- Actions génériques -->
+    <string name="action_retour">Retour</string>
+    <string name="action_annuler">Annuler</string>
+    <string name="action_supprimer">Supprimer</string>
+    <string name="action_modifier">Modifier</string>
+    <string name="action_fermer">Fermer</string>
+    <string name="cd_retour">Retour</string>
+    <string name="cd_modifier">Modifier</string>
+    <string name="cd_supprimer">Supprimer</string>
+
+    <!-- Barre de navigation -->
+    <string name="nav_annonces">Annonces</string>
+    <string name="nav_mes_annonces">Mes annonces</string>
+    <string name="nav_favoris">Favoris</string>
+    <string name="nav_profil">Profil</string>
+    <string name="cd_publier">Publier une annonce</string>
+
+    <!-- Catalogue -->
+    <string name="listings_sous_titre">Les bons plans des étudiants, entre deux cours.</string>
+    <string name="listings_recherche">Rechercher un objet, une catégorie…</string>
+    <string name="listings_section">À la une</string>
+    <plurals name="listings_nb_annonces">
+        <item quantity="one">%d annonce</item>
+        <item quantity="other">%d annonces</item>
+    </plurals>
+    <string name="listings_vide_titre">Aucun résultat</string>
+    <string name="listings_vide_message">Aucune annonce ne correspond à cette recherche. Essayez un autre mot-clé, une autre catégorie ou une autre fourchette de prix.</string>
+    <string name="listings_vide_action">Réinitialiser</string>
+    <string name="listings_catalogue_vide_titre">Le campus est calme…</string>
+    <string name="listings_catalogue_vide_message">Aucune annonce disponible pour l\'instant. Soyez le premier à vendre quelque chose !</string>
+    <string name="listings_erreur">Impossible de charger les annonces</string>
+
+    <!-- Filtre de prix -->
+    <string name="filtre_tout">Tout</string>
+    <string name="filtre_prix_bouton">Prix</string>
+    <string name="filtre_prix_titre">Fourchette de prix</string>
+    <string name="filtre_prix_min">Minimum</string>
+    <string name="filtre_prix_max">Maximum</string>
+    <string name="filtre_prix_appliquer">Appliquer</string>
+    <string name="filtre_prix_effacer">Effacer</string>
+    <string name="filtre_prix_resume">%1$s – %2$s</string>
+
+    <!-- Catégories -->
+    <string name="categorie_livres">Livres</string>
+    <string name="categorie_cours">Cours</string>
+    <string name="categorie_electronique">Électronique</string>
+    <string name="categorie_sport">Sport &amp; loisirs</string>
+    <string name="categorie_mobilier">Mobilier</string>
+    <string name="categorie_vetements">Vêtements</string>
+    <string name="categorie_autre">Autre</string>
+
+    <!-- États d'une annonce -->
+    <string name="etat_disponible">Disponible</string>
+    <string name="etat_reservee">Réservée</string>
+    <string name="etat_vendue">Vendue</string>
+    <string name="etat_reservee_par">Réservée par %1$s</string>
+    <string name="etat_vendue_le">Vendue le %1$s</string>
+    <string name="etat_disponible_message">Cette annonce est disponible : réservez-la ou contactez le vendeur.</string>
+
+    <!-- Rôles -->
+    <string name="role_etudiant">Étudiant</string>
+    <string name="role_administrateur">Administrateur</string>
+
+    <!-- Carte d'annonce -->
+    <string name="carte_vendeur_date">%1$s · %2$s</string>
+    <string name="carte_favori_ajouter">Ajouter aux favoris</string>
+    <string name="carte_favori_retirer">Retirer des favoris</string>
+    <string name="carte_photo_description">Photo de l\'annonce</string>
+
+    <!-- Formulaire d'annonce -->
+    <string name="champ_titre">Titre</string>
+    <string name="champ_titre_placeholder">Ex. Manuel de Kotlin, 3e édition</string>
+    <string name="champ_description">Description</string>
+    <string name="champ_description_placeholder">État, édition, raison de la vente…</string>
+    <string name="champ_prix">Prix (€)</string>
+    <string name="champ_categorie">Catégorie</string>
+    <string name="champ_photo">Photo (facultatif)</string>
+    <string name="champ_photo_placeholder">Lien d\'une image</string>
+    <string name="champ_photo_aide">Choisissez une photo de votre galerie ou collez un lien.</string>
+    <string name="photo_choisir">Choisir une photo</string>
+    <string name="photo_retirer">Retirer</string>
+
+    <!-- Détail d'une annonce -->
+    <string name="detail_introuvable_titre">Annonce introuvable</string>
+    <string name="detail_introuvable_message">Cette annonce n\'existe plus.</string>
+    <string name="detail_retour_catalogue">Retour au catalogue</string>
+    <string name="detail_description">Description</string>
+    <string name="detail_sans_description">Aucune description fournie.</string>
+    <string name="detail_publiee_le">Publiée le %1$s</string>
+    <string name="detail_reservee_pour">Réservée pour %1$s</string>
+    <string name="detail_supprimer_titre">Supprimer l\'annonce ?</string>
+    <string name="detail_supprimer_message">« %1$s » sera définitivement retirée du catalogue.</string>
+    <string name="detail_reserver_titre">Réserver l\'annonce</string>
+    <string name="detail_reserver_message">Indiquez le nom de l\'acheteur : l\'annonce passera en « Réservée » et ne sera plus visible dans le catalogue.</string>
+    <string name="detail_reserver_champ">Nom de l\'acheteur</string>
+    <string name="detail_reserver_action">Réserver</string>
+    <string name="detail_reserver_vendeur">Réserver à un acheteur</string>
+    <string name="detail_vendre">Marquer comme vendue</string>
+    <string name="detail_annuler_reservation">Annuler la réservation</string>
+    <string name="detail_remettre_en_vente">Remettre en vente</string>
+    <string name="detail_republier">Republier l\'annonce</string>
+    <string name="detail_contacter_titre">Contacter le vendeur</string>
+    <string name="detail_contacter_message">%1$s est joignable à l\'adresse suivante :</string>
+    <string name="detail_contacter">Contacter %1$s</string>
+    <string name="detail_connexion_pour_contacter">Se connecter pour contacter le vendeur</string>
+    <string name="detail_admin_supprimer">Supprimer (administrateur)</string>
+    <string name="detail_admin_supprimer_titre">Supprimer en tant qu\'administrateur ?</string>
+    <string name="detail_admin_supprimer_message">Le motif est obligatoire : il est conservé dans le journal de modération et permet de répondre au vendeur.</string>
+    <string name="detail_admin_motif">Motif de la suppression</string>
+    <string name="detail_erreur">Action impossible.</string>
+
+    <!-- Publication -->
+    <string name="post_titre">Publier une annonce</string>
+    <string name="post_sous_titre">Quelques détails suffisent : un titre clair, un prix juste, une catégorie.</string>
+    <string name="post_action">Publier l\'annonce</string>
+    <string name="post_connexion_requise">Connectez-vous pour publier une annonce.</string>
+    <string name="post_erreur">Publication impossible.</string>
+
+    <!-- Modification -->
+    <string name="edit_titre">Modifier l\'annonce</string>
+    <string name="edit_action">Enregistrer</string>
+    <string name="edit_impossible_titre">Modification impossible</string>
+    <string name="edit_connexion_requise">Connectez-vous pour modifier une annonce.</string>
+    <string name="edit_pas_proprietaire">Vous n\'êtes pas le propriétaire de cette annonce.</string>
+    <string name="edit_vendue">Une annonce vendue ne peut plus être modifiée : republiez-la pour la remettre en vente.</string>
+    <string name="edit_erreur">Enregistrement impossible.</string>
+
+    <!-- Mes annonces -->
+    <string name="mes_titre">Mes annonces</string>
+    <string name="mes_bonjour">Bonjour %1$s, voici vos ventes.</string>
+    <string name="mes_bonjour_sans_nom">Bonjour, voici vos ventes.</string>
+    <string name="mes_stat_publiees">Publiées</string>
+    <string name="mes_stat_en_ligne">En ligne</string>
+    <string name="mes_stat_reservees">Réservées</string>
+    <string name="mes_stat_vendues">Vendues</string>
+    <string name="mes_filtre_toutes">Toutes</string>
+    <string name="mes_filtre_en_ligne">En ligne</string>
+    <string name="mes_filtre_vendues">Vendues</string>
+    <string name="mes_vide_toutes">Aucune annonce</string>
+    <string name="mes_vide_toutes_message">Publiez votre premier objet : en deux minutes, c\'est en ligne.</string>
+    <string name="mes_vide_en_ligne">Rien en ligne</string>
+    <string name="mes_vide_en_ligne_message">Marquez une annonce comme vendue depuis sa fiche pour la retrouver ici.</string>
+    <string name="mes_vide_vendues">Aucune vente</string>
+    <string name="mes_vide_vendues_message">Vos annonces vendues apparaissent dans l\'onglet « Vendues ».</string>
+    <string name="mes_erreur_titre">Oups</string>
+    <string name="mes_erreur">Impossible de charger vos annonces.</string>
+
+    <!-- Favoris -->
+    <string name="favoris_titre">Favoris</string>
+    <string name="favoris_sous_titre">Les objets que vous gardez à l\'œil.</string>
+    <string name="favoris_vide_titre">Aucun favori</string>
+    <string name="favoris_vide_message">Touchez le cœur d\'une annonce pour la retrouver ici, même après sa vente.</string>
+    <string name="favoris_connexion_message">Connectez-vous pour enregistrer vos favoris.</string>
+    <string name="favoris_erreur">Impossible de charger vos favoris.</string>
+
+    <!-- Profil -->
+    <string name="profil_non_connecte_titre">Pas encore connecté</string>
+    <string name="profil_non_connecte_message">Connectez-vous avec votre compte ISEP pour publier, réserver et suivre vos ventes.</string>
+    <string name="profil_se_connecter">Se connecter</string>
+    <string name="profil_mon_activite">Mon activité</string>
+    <string name="profil_infos">Informations du compte</string>
+    <string name="profil_nom">Nom</string>
+    <string name="profil_email">Email</string>
+    <string name="profil_role">Rôle</string>
+    <string name="profil_membre_depuis">Membre depuis</string>
+    <string name="profil_deconnexion">Se déconnecter</string>
+    <string name="profil_moderation">Journal de modération</string>
+    <string name="profil_moderation_vide">Aucune suppression administrative pour l\'instant.</string>
+    <string name="profil_moderation_entree">%1$s — %2$s</string>
+
+    <!-- Connexion -->
+    <string name="login_titre">Bon retour 👋</string>
+    <string name="login_sous_titre">Connectez-vous pour publier une annonce, réserver un objet et suivre vos ventes.</string>
+    <string name="login_email">Email ISEP</string>
+    <string name="login_email_placeholder">prenom.nom@etu.fr</string>
+    <string name="login_mot_de_passe">Mot de passe</string>
+    <string name="login_afficher">Afficher</string>
+    <string name="login_masquer">Masquer</string>
+    <string name="login_action">Se connecter</string>
+    <string name="login_comptes_demo">Comptes de démonstration</string>
+    <string name="login_comptes_demo_aide">toucher pour remplir</string>
+    <string name="login_erreur_champs">Renseignez votre email et votre mot de passe.</string>
+    <string name="login_erreur_identifiants">Email ou mot de passe incorrect.</string>
+
+    <!-- Erreurs métier (ReglesAnnonce) -->
+    <string name="erreur_titre_vide">Le titre ne doit pas être vide.</string>
+    <string name="erreur_titre_trop_long">Le titre est trop long (80 caractères maximum).</string>
+    <string name="erreur_description_trop_longue">La description est trop longue (1000 caractères maximum).</string>
+    <string name="erreur_prix_invalide">Le prix doit être supérieur à 0 €.</string>
+    <string name="erreur_acheteur_obligatoire">Indiquez le nom de l\'acheteur.</string>
+    <string name="erreur_motif_obligatoire">Indiquez le motif de la suppression.</string>
+    <string name="erreur_motif_trop_long">Le motif est trop long (200 caractères maximum).</string>
+    <string name="erreur_transition_interdite">Cette transition d\'état n\'est pas autorisée.</string>
+    <string name="erreur_annonce_introuvable">Cette annonce n\'existe plus.</string>
+    <string name="erreur_non_proprietaire">Seul le propriétaire peut effectuer cette action.</string>
+    <string name="erreur_non_administrateur">Cette action est réservée aux administrateurs.</string>
+
 </resources>
