@@ -35,11 +35,11 @@ Pour éviter que cela se reproduise : `Edit` l'AVD → *Boot option* = **Cold bo
 
 ## Structure du code
 
-- `app/src/main/java/com/swapcampus/ui/` — écrans et composants Compose, ViewModels
-- `app/src/main/java/com/swapcampus/domain/` — entités et catalogue en mémoire
-- `app/src/main/java/com/swapcampus/repository/` — dépôts (annonces, authentification)
+- `shared/ui` — écrans et composants Compose, ViewModels
+- `shared/commonMain/domain` — entités et catalogue en mémoire
+- `shared/commonMain/repository` — dépôts (annonces, authentification)
 - `app/src/main/java/com/swapcampus/navigation/` — routes et NavHost
-- `app/src/main/java/com/swapcampus/di/AppContainer.kt` — injection de dépendances manuelle
+- `shared/commonMain/di` — injection de dépendances manuelle
 - `app/src/main/java/com/isep/shared/domain/` — ancien package domaine, encore présent (doublon à fusionner)
 - `app/src/test/` — tests unitaires du dépôt d'annonces
 
