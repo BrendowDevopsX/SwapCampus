@@ -37,7 +37,7 @@ Pour éviter que cela se reproduise : `Edit` l'AVD → *Boot option* = **Cold bo
 
 | Cas d'utilisation | Où |
 |---|---|
-| UC1 — publier une annonce | FAB « + » ou bouton de l'en-tête « Mes annonces » → formulaire (titre, description, prix, catégorie, photo URL facultative) |
+| UC1 — publier une annonce | FAB « + » ou bouton de l'en-tête « Mes annonces » → formulaire (titre, description, prix, catégorie, photo choisie dans la galerie ou lien) |
 | UC2 — parcourir | Onglet « Annonces » : cartes avec illustration de catégorie, statut, prix, vendeur ; seules les annonces **disponibles** sont listées |
 | UC3 — rechercher / filtrer | Champ de recherche (titre et description) + puces de catégorie ; état vide explicite avec bouton « Réinitialiser » |
 | UC4 — modifier | Fiche de l'annonce → « Modifier » (propriétaire uniquement ; une annonce vendue doit être republiée) |
@@ -63,6 +63,25 @@ Comptes de démonstration (mot de passe entre parenthèses) :
 - `app/src/main/java/com/isep/shared/domain/` — ancien package domaine, encore présent (doublon à fusionner)
 - `app/src/test/` — tests unitaires (domaine, dépôt d'annonces, authentification)
 - `app/src/androidTest/` — test d'interface du parcours de publication
+
+## Photos
+
+Le champ photo de la publication et de la modification propose deux entrées :
+
+- **« Choisir une photo »** — ouvre le sélecteur de photos du système (Photo Picker,
+  `ActivityResultContracts.PickVisualMedia`), donc l'accès à la galerie sans aucune permission à
+  déclarer dans le manifeste ;
+- **un lien** `https://…`, pour utiliser une image distante.
+
+La photo retenue est stockée dans `Annonce.photoUrl` sous forme d'URI `content://…` ou d'URL : le
+domaine ne manipule donc qu'une `String`. Le chargement est fait sans bibliothèque externe
+(`ContentResolver` pour les URI locales, `HttpURLConnection` pour les URL), avec un sous-
+échantillonnage à 1 024 px pour ne pas décoder une photo de 12 Mpx dans une vignette de 84 dp.
+L'affichage retombe toujours sur l'illustration de la catégorie si l'image n'est plus lisible.
+
+> Limite actuelle (TP1) : l'autorisation d'accès accordée par le sélecteur dure le temps du
+> processus, et rien n'est persisté. Au TP2 (stockage local), il faudra copier le fichier dans le
+> stockage de l'application pour que la photo survive au redémarrage.
 
 ## Tests
 

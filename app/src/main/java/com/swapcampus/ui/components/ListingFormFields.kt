@@ -118,22 +118,13 @@ fun ListingFormFields(
             }
         }
 
-        OutlinedTextField(
-            value = photoUrl,
-            onValueChange = onPhotoUrlChange,
+        ChampPhoto(
+            photoUrl = photoUrl,
+            onPhotoUrlChange = onPhotoUrlChange,
+            categorie = categorie,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 2.dp)
-                .testTag("champ_photo"),
-            label = { Text("Photo (URL, facultatif)") },
-            placeholder = { Text("https://…") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Done
-            ),
-            supportingText = { Text("Laissez vide pour utiliser l'illustration de la catégorie.") },
-            shape = MaterialTheme.shapes.medium
         )
     }
 }
