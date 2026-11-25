@@ -1,0 +1,26 @@
+# --- Gradle ---
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# --- Local machine configuration (each dev has their own SDK path) ---
+local.properties
+
+# --- Android Studio / IntelliJ ---
+.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+
+# --- Build outputs ---
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# --- Logs / OS junk ---
+*.log
+.DS_Store
+Thumbs.db
